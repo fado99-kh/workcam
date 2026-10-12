@@ -21,6 +21,8 @@
   --t-fast:.14s; --t-mid:.22s; --t-screen:.36s;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* iOS home-screen apps lay the page out short by the status bar height; this fills the strip left at the bottom */
+html{min-height:calc(100% + env(safe-area-inset-top))}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,"SF Arabic","Segoe UI",Tahoma,sans-serif;
   -webkit-user-select:none;user-select:none;overscroll-behavior:none}
@@ -360,7 +362,7 @@ main{padding-bottom:calc(var(--sb) + 130px)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
-    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v6</p>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v7</p>
   </div>
 </div>
 
@@ -993,7 +995,10 @@ let recorder = null, chunks = [], recStart = 0, recTimer = 0, recThumb = null, s
 const sessionIds = new Set();
 const camVideo = $('camVideo'), cam = $('cam');
 
+let streamMode = '', idleTimer = 0;
+const streamLive = () => !!stream && stream.getVideoTracks().some(tr => tr.readyState === 'live');
 function stopStream(){
+  clearTimeout(idleTimer);
   if (stream) stream.getTracks().forEach(tr => tr.stop());
   stream = null; camVideo.srcObject = null;
 }
@@ -1013,6 +1018,7 @@ async function startStream(){
   const track = stream.getVideoTracks()[0], max = track.getCapabilities?.() || {};
   if (photo && max.width?.max && max.height?.max)
     await track.applyConstraints({width: {ideal: max.width.max}, height: {ideal: max.height.max}}).catch(() => {});
+  streamMode = camMode;
   camVideo.srcObject = stream;
   camVideo.style.setProperty('--m', facing === 'user' ? -1 : 1);
   torch = false; $('camTorch').classList.remove('on');
@@ -1027,12 +1033,17 @@ async function openCam(){
   $('camAlbum').hidden = !a; $('camAlbum').lastElementChild.textContent = a;
   setMode('photo', true); setZoom(1);
   show(cam);
+  clearTimeout(idleTimer);
+  // reuse the camera if it is still on, so iOS does not ask for permission again
+  if (streamLive() && streamMode === 'photo') return;
   try { await startStream(); }
   catch(e){ closeCam(); toast(t('ما قدرت أفتح الكاميرا. تأكد من الإذن أو استخدم "جودة كاملة"')); }
 }
 function closeCam(){
   if (recorder) stopRec();
-  stopStream();
+  // keep the camera on briefly: reopening it right away then needs no new permission prompt
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(stopStream, 90000);
   hide(cam);
 }
 function setMode(mode, silent){
@@ -1208,7 +1219,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden){
     commitPending();
     if (recorder) stopRec();
-    if (isOpen(cam)) stopStream();
+    stopStream();
   } else {
     if (isOpen(cam)) startStream().catch(closeCam);
     if (db) cleanup().then(render);

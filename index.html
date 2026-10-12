@@ -14,150 +14,261 @@
 <link rel="icon" href="icon-180.png">
 <style>
 :root{
-  --bg:#0e1014; --panel:#181b22; --panel2:#222630; --line:#2c313c;
-  --text:#f2f3f5; --muted:#9299a6; --accent:#ffb020; --danger:#ff5a4f;
+  --bg:#0e1014; --panel:#181b22; --panel2:#232733; --line:#2c313c;
+  --text:#f2f3f5; --muted:#9299a6; --accent:#ffb020; --accent2:#ff8c14; --danger:#ff5a4f;
   --st:env(safe-area-inset-top); --sb:env(safe-area-inset-bottom);
+  --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.2,1.2,.3,1);
+  --t-fast:.14s; --t-mid:.22s; --t-screen:.36s;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,"SF Arabic","Segoe UI",Tahoma,sans-serif;
   -webkit-user-select:none;user-select:none;overscroll-behavior:none}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;
+  transition:transform var(--t-fast) var(--ease),background-color var(--t-fast),color var(--t-fast),opacity var(--t-fast)}
+button:active{transform:scale(.95)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input{-webkit-user-select:text;user-select:text}
 [hidden]{display:none!important}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;
-  padding:calc(var(--st) + 10px) 14px 10px;background:rgba(14,16,20,.92);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-header h1{font-size:19px;margin:0;font-weight:700}
-header .sub{font-size:12px;color:var(--muted);margin-top:2px}
-header .grow{flex:1}
-.hbtn{height:36px;min-width:36px;padding:0 12px;border-radius:18px;background:var(--panel2);
-  font-size:14px;display:flex;align-items:center;justify-content:center}
+/* header */
+header{position:sticky;top:0;z-index:5;padding-top:calc(var(--st) + 10px);background:rgba(14,16,20,.9);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:10px;padding:0 14px 10px}
+.logo{width:38px;height:38px;border-radius:10px;flex:none}
+.ttl{flex:1;min-width:0}
+.ttl h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.2px}
+.sub{font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbtn{height:36px;min-width:36px;padding:0 13px;border-radius:18px;background:var(--panel2);
+  font-size:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.hbtn.icon{padding:0;width:36px}
 .hbtn.on{background:var(--accent);color:#111;font-weight:600}
-.hbtn svg{width:20px;height:20px}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:0 14px 10px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fchip{flex:none;height:32px;padding:0 12px;border-radius:16px;background:var(--panel);border:1px solid var(--line);
+  font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.fchip i{font-style:normal;font-size:11px;opacity:.75}
+.fchip.on{background:var(--accent);border-color:var(--accent);color:#111;font-weight:600}
+.fchip.add{padding:0;width:32px;justify-content:center;font-size:18px}
 
 .banner{margin:10px 12px 0;padding:10px 12px;border-radius:12px;background:#2a2412;
   border:1px solid #5a4a16;font-size:13px;line-height:1.6;display:flex;gap:10px;align-items:flex-start}
 .banner b{color:var(--accent)}
-.banner button{color:var(--muted);font-size:18px;line-height:1}
+.banner button{color:var(--muted);font-size:18px;line-height:1;padding:2px 6px}
 
-main{padding-bottom:calc(var(--sb) + 120px)}
-.day{padding:14px 14px 6px;font-size:13px;color:var(--muted);font-weight:600}
+/* grid */
+main{padding-bottom:calc(var(--sb) + 130px)}
+.day{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 6px;
+  font-size:13px;color:var(--muted);font-weight:600}
+.dayall{font-size:13px;color:var(--accent);font-weight:600;display:none;padding:2px 4px}
+.selecting .dayall{display:block}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
 @media(min-width:600px){.grid{grid-template-columns:repeat(5,1fr)}}
-.cell{position:relative;aspect-ratio:1;background:var(--panel);overflow:hidden}
-.cell img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-.cell .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
-.tag{position:absolute;bottom:4px;left:4px;font-size:11px;padding:1px 6px;border-radius:8px;
-  background:rgba(0,0,0,.6)}
+@media(min-width:1000px){.grid{grid-template-columns:repeat(8,1fr)}}
+.cell{position:relative;aspect-ratio:1;background:var(--panel);overflow:hidden;
+  transition:transform var(--t-mid) var(--ease),opacity var(--t-mid),filter var(--t-mid)}
+.cell:active{transform:scale(.97)}
+.cell img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;
+  transition:transform var(--t-mid) var(--ease),border-radius var(--t-mid)}
+.cell .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+.cell.in{animation:cellIn .4s var(--ease) both;animation-delay:calc(var(--i) * 32ms)}
+.cell.pop{animation:pop .45s var(--spring) both}
+.cell.out{transform:scale(.8);opacity:0;filter:blur(8px)}
+@keyframes cellIn{from{opacity:0;transform:scale(.94) translateY(8px)}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}}
+.tag{position:absolute;bottom:5px;inset-inline-start:5px;font-size:11px;padding:2px 7px;border-radius:9px;
+  background:rgba(0,0,0,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .tag.soon{background:var(--danger);color:#fff}
-.tag.keep{background:var(--accent);color:#111}
-.vid{position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;
-  background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
+.tag.keep{background:var(--accent);color:#111;font-weight:600}
+.vid{position:absolute;top:5px;inset-inline-start:5px;width:22px;height:22px;border-radius:50%;
+  background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center}
 .vid svg{width:10px;height:10px}
-.check{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;
-  border:2px solid #fff;background:rgba(0,0,0,.3);display:none}
-.selecting .check{display:block}
-.cell.sel .check{background:var(--accent);border-color:var(--accent)}
+.check{position:absolute;top:6px;inset-inline-end:6px;width:23px;height:23px;border-radius:50%;
+  border:2px solid #fff;background:rgba(0,0,0,.3);opacity:0;transform:scale(.9);
+  transition:opacity var(--t-fast),transform var(--t-mid) var(--spring),background-color var(--t-fast)}
+.selecting .check{opacity:1;transform:none}
+.cell.sel .check{background:var(--accent);border-color:var(--accent);transform:scale(1.08)}
 .cell.sel .check::after{content:"";position:absolute;inset:4px 3px 6px;border:solid #111;
   border-width:0 0 2.5px 2.5px;transform:rotate(-45deg)}
-.cell.sel img{opacity:.6}
+.cell.sel img{transform:scale(.84);border-radius:10px}
 
-.empty{text-align:center;color:var(--muted);padding:90px 30px;line-height:1.9;font-size:15px}
-.empty svg{width:54px;height:54px;opacity:.5;margin-bottom:8px}
+.empty{text-align:center;color:var(--muted);padding:80px 30px;line-height:1.9;font-size:15px;animation:cellIn .5s var(--ease) both}
+.empty img{width:84px;height:84px;border-radius:22px;margin-bottom:14px;opacity:.9}
+.empty .wide{max-width:220px;margin:18px auto 0;display:block}
 
-.dock{position:fixed;inset:auto 0 0 0;z-index:6;padding:14px 16px calc(var(--sb) + 14px);
+/* dock */
+.dock{position:fixed;inset:auto 0 0 0;z-index:6;padding:16px 16px calc(var(--sb) + 14px);
   display:flex;align-items:center;justify-content:center;gap:14px;
-  background:linear-gradient(transparent,rgba(14,16,20,.95) 40%)}
-.fab{width:68px;height:68px;border-radius:50%;background:var(--accent);color:#111;
-  display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(255,176,32,.35)}
-.fab svg{width:30px;height:30px}
-.fab:active{transform:scale(.94)}
-.side{height:44px;padding:0 14px;border-radius:22px;background:var(--panel2);font-size:13px;
-  display:flex;align-items:center;gap:6px}
-.side svg{width:18px;height:18px}
+  background:linear-gradient(transparent,rgba(14,16,20,.96) 45%);
+  transition:transform var(--t-screen) var(--ease),opacity var(--t-mid)}
+.dock.away{transform:translateY(110%);opacity:0;pointer-events:none}
+.fab{width:70px;height:70px;border-radius:50%;color:#111;flex:none;
+  background:linear-gradient(140deg,#ffc440,var(--accent2));
+  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(255,160,32,.38)}
+.fab .ic{width:30px;height:30px;stroke-width:2.2}
+.fab:active{transform:scale(.92)}
+.side{height:46px;width:112px;border-radius:23px;background:var(--panel2);font-size:13px;
+  display:flex;align-items:center;justify-content:center;gap:6px}
+.side .ic{width:18px;height:18px}
 
+/* selection bar */
 .selbar{position:fixed;inset:auto 0 0 0;z-index:7;background:var(--panel);border-top:1px solid var(--line);
-  padding:8px 8px calc(var(--sb) + 8px);display:flex;justify-content:space-around}
-.act{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;padding:6px 14px;
-  min-width:72px;border-radius:10px}
-.act svg{width:24px;height:24px}
-.act:active{background:var(--panel2)}
+  padding:8px 4px calc(var(--sb) + 8px);display:flex;justify-content:space-around;
+  transform:translateY(110%);transition:transform var(--t-screen) var(--ease)}
+.selbar.show{transform:none}
+.act{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;padding:6px 4px;
+  min-width:60px;border-radius:10px;white-space:nowrap}
+.act .ic{width:24px;height:24px}
 .act.danger{color:var(--danger)}
 .act:disabled{opacity:.35}
 
 /* camera */
-#cam{position:fixed;inset:0;z-index:20;background:#000;display:flex;flex-direction:column}
-#cam video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
-#cam .top{position:absolute;top:0;inset-inline:0;padding:calc(var(--st) + 10px) 14px 10px;
-  display:flex;justify-content:space-between;align-items:center;z-index:2}
-.pill{height:34px;padding:0 14px;border-radius:17px;background:rgba(0,0,0,.5);font-size:14px;
-  display:flex;align-items:center;gap:6px}
+#cam{position:fixed;inset:0;z-index:20;background:#000;display:flex;flex-direction:column;
+  opacity:0;transform:scale(.97);transition:opacity var(--t-mid),transform var(--t-screen) var(--ease)}
+#cam.open{opacity:1;transform:none}
+#camView{flex:1;min-height:0;position:relative;overflow:hidden}
+#camVideo{width:100%;height:100%;object-fit:contain;background:#000;--z:1;--m:1;
+  transform:scale(calc(var(--z) * var(--m)),var(--z));transition:transform .28s var(--ease)}
+#gridLines{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity var(--t-mid);
+  background:
+   linear-gradient(to right,transparent calc(33.33% - .5px),rgba(255,255,255,.45) 0,rgba(255,255,255,.45) calc(33.33% + .5px),transparent 0,
+     transparent calc(66.66% - .5px),rgba(255,255,255,.45) 0,rgba(255,255,255,.45) calc(66.66% + .5px),transparent 0),
+   linear-gradient(to bottom,transparent calc(33.33% - .5px),rgba(255,255,255,.45) 0,rgba(255,255,255,.45) calc(33.33% + .5px),transparent 0,
+     transparent calc(66.66% - .5px),rgba(255,255,255,.45) 0,rgba(255,255,255,.45) calc(66.66% + .5px),transparent 0)}
+#gridLines.on{opacity:1}
+.camtop{position:absolute;top:0;inset-inline:0;padding:calc(var(--st) + 10px) 12px 10px;
+  display:flex;gap:8px;align-items:center;z-index:2}
+.camtop .grow{flex:1}
+.pill{height:36px;min-width:36px;padding:0 14px;border-radius:18px;background:rgba(0,0,0,.5);font-size:14px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.pill.icon{padding:0;width:36px}
+.pill.icon .ic{width:19px;height:19px}
+.pill.on{background:var(--accent);color:#111}
+#camAlbum{max-width:40vw;font-size:12px;color:var(--accent);pointer-events:none}
+#camAlbum span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #rec{color:#fff;background:var(--danger);font-variant-numeric:tabular-nums;direction:ltr}
-#cam .bottom{padding:10px 20px calc(var(--sb) + 18px);background:#000}
+#camZoom{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:2;font-weight:600;font-size:13px;min-width:46px}
+#camZoom:active{transform:translateX(-50%) scale(.94)}
+.cambottom{padding:10px 22px calc(var(--sb) + 18px);background:#000}
 .modes{display:flex;justify-content:center;gap:22px;font-size:14px;color:var(--muted);margin-bottom:14px}
+.modes button{padding:4px 8px}
 .modes button.on{color:var(--accent);font-weight:700}
-.row{display:flex;align-items:center;justify-content:space-between}
-.last{width:52px;height:52px;border-radius:10px;background:#222 center/cover;position:relative;
-  border:1px solid #444}
-.last span{position:absolute;top:-7px;left:-7px;min-width:20px;height:20px;border-radius:10px;
+.camrow{display:flex;align-items:center;justify-content:space-between}
+.last{width:52px;height:52px;border-radius:12px;background:#1c1c1c center/cover;position:relative;border:1px solid #444}
+.last.pop{animation:lastPop .4s var(--spring)}
+@keyframes lastPop{from{transform:scale(.6);opacity:.3}}
+.last span{position:absolute;top:-7px;inset-inline-start:-7px;min-width:20px;height:20px;border-radius:10px;
   background:var(--accent);color:#111;font-size:12px;font-weight:700;display:flex;
   align-items:center;justify-content:center;padding:0 5px}
-#shutter{width:74px;height:74px;border-radius:50%;border:4px solid #fff;padding:4px}
-#shutter i{display:block;width:100%;height:100%;border-radius:50%;background:#fff;transition:all .15s}
-#shutter:active i{transform:scale(.9)}
+#shutter{width:76px;height:76px;border-radius:50%;border:4px solid #fff;padding:4px}
+#shutter i{display:block;width:100%;height:100%;border-radius:50%;background:#fff;
+  transition:transform .16s var(--ease),border-radius .2s var(--ease),background-color .2s}
+#shutter:active{transform:none}
+#shutter:active i{transform:scale(.86)}
 #shutter.video i{background:var(--danger)}
-#shutter.recording i{border-radius:8px;transform:scale(.5)}
-.round{width:52px;height:52px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center}
-.round svg{width:24px;height:24px}
+#shutter.recording i{border-radius:9px;transform:scale(.5)}
+.round{width:52px;height:52px;border-radius:50%;background:#1c1c1c;display:flex;align-items:center;justify-content:center}
+#camFlip .ic{transition:transform .4s var(--ease)}
+#camFlip.spin .ic{transform:rotate(180deg)}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:3}
-#flash.go{animation:fl .18s}
-@keyframes fl{from{opacity:.7}to{opacity:0}}
+#flash.go{animation:fl .2s ease-out}
+@keyframes fl{from{opacity:.75}to{opacity:0}}
 
 /* viewer */
-#viewer{position:fixed;inset:0;z-index:30;background:#000;display:flex;flex-direction:column}
-#viewer .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-#viewer img,#viewer video{max-width:100%;max-height:100%}
-#viewer .top{padding:calc(var(--st) + 10px) 14px 10px;display:flex;justify-content:space-between;align-items:center}
-#viewer .info{font-size:13px;color:var(--muted)}
-#viewer .bar{display:flex;justify-content:space-around;padding:8px 8px calc(var(--sb) + 8px);background:#000}
+#viewer{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column}
+.vbg{position:absolute;inset:0;background:#000;opacity:0;transition:opacity .26s}
+#viewer.open .vbg{opacity:1}
+.vtop,.vbar{position:relative;z-index:2;opacity:0;transition:opacity var(--t-mid)}
+#viewer.open .vtop,#viewer.open .vbar{opacity:1}
+.vtop{padding:calc(var(--st) + 10px) 14px 10px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.vinfo{text-align:end;font-size:12px;color:var(--muted);line-height:1.5;min-width:0}
+.vinfo b{color:var(--text);font-weight:600;font-size:13px}
+.stage{flex:1;min-height:0;position:relative;overflow:hidden;touch-action:none}
+#vWrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  transition:transform .3s var(--ease),opacity var(--t-mid)}
+#vWrap>*{max-width:100%;max-height:100%;transition:transform var(--t-mid) var(--ease);-webkit-user-drag:none}
+#viewer.drag .vbg,#viewer.drag #vWrap,#viewer.drag #vWrap>*{transition:none}
+.vbar{display:flex;justify-content:space-around;padding:8px 4px calc(var(--sb) + 8px)}
 
-/* sheet */
-.scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.6);display:flex;align-items:flex-end}
-.sheet{width:100%;max-height:88%;overflow:auto;background:var(--panel);border-radius:20px 20px 0 0;
-  padding:18px 18px calc(var(--sb) + 22px)}
+/* sheets */
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;
+  opacity:0;transition:opacity var(--t-mid)}
+.scrim.open{opacity:1}
+.sheet{width:100%;max-width:560px;margin:0 auto;max-height:88%;overflow:auto;background:var(--panel);border-radius:22px 22px 0 0;
+  padding:10px 18px calc(var(--sb) + 22px);transform:translateY(100%);transition:transform var(--t-mid) ease-in}
+.scrim.open .sheet{transform:none;transition:transform .42s var(--spring)}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
 .sheet h2{margin:0 0 4px;font-size:18px}
-.sheet h3{margin:22px 0 8px;font-size:14px;color:var(--muted);font-weight:600}
+.sheet h3{margin:22px 0 8px;font-size:13px;color:var(--muted);font-weight:600}
 .sheet p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:9px 14px;border-radius:18px;background:var(--panel2);font-size:14px;border:1px solid transparent}
 .chip.on{border-color:var(--accent);color:var(--accent);font-weight:600}
 .custom{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px}
-.custom input{width:80px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--bg);
-  color:var(--text);font:inherit;text-align:center;-webkit-user-select:text;user-select:text}
+.custom input,.addrow input{height:40px;border-radius:12px;border:1px solid var(--line);background:var(--bg);
+  color:var(--text);font:inherit;padding:0 12px;outline:none}
+.custom input{width:80px;text-align:center}
+.custom input:focus,.addrow input:focus{border-color:var(--accent)}
 .stat{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .stat span:last-child{color:var(--muted);direction:ltr}
-.wide{width:100%;height:46px;border-radius:12px;background:var(--panel2);margin-top:12px;font-size:15px}
+.bar{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;width:100%;border-radius:4px;transform-origin:left;transform:scaleX(0);
+  background:linear-gradient(90deg,#ffc440,var(--accent2));transition:transform .7s var(--ease)}
+[dir=rtl] .bar i{transform-origin:right}
+.wide{width:100%;height:46px;border-radius:13px;background:var(--panel2);margin-top:12px;font-size:15px}
 .wide.danger{color:var(--danger)}
 .wide.primary{background:var(--accent);color:#111;font-weight:700}
+.alist{display:flex;flex-direction:column;margin:10px 0 4px}
+.arow{display:flex;align-items:center;gap:10px;padding:13px 4px;border-bottom:1px solid var(--line);font-size:15px;text-align:start}
+.arow .ic{color:var(--accent);width:20px;height:20px}
+.arow i{margin-inline-start:auto;font-style:normal;color:var(--muted);font-size:13px}
+.addrow{display:flex;gap:8px;margin-top:14px}
+.addrow input{flex:1;min-width:0}
+.addrow .hbtn{height:40px;border-radius:12px}
 
-#toast{position:fixed;left:50%;bottom:calc(var(--sb) + 110px);transform:translateX(-50%);z-index:60;
-  background:#fff;color:#111;padding:9px 16px;border-radius:20px;font-size:14px;max-width:86%;
-  text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+#toast{position:fixed;left:50%;bottom:calc(var(--sb) + 108px);z-index:60;
+  background:#f4f4f5;color:#111;padding:9px 16px;border-radius:22px;font-size:14px;max-width:88%;
+  display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.45);
+  opacity:0;transform:translate(-50%,14px) scale(.96);pointer-events:none;
+  transition:opacity var(--t-mid),transform var(--t-mid) ease-in}
+#toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;transition:opacity var(--t-mid),transform .34s var(--spring)}
+#toast button{color:#b86a00;font-weight:700;padding:4px 2px}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body>
 
+<svg hidden>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 4v11M8 11l4 4 4-4M5 19h14"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol>
+  <symbol id="i-keep" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-renew" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5"/><path d="M12 8v4.5l3 1.5"/></symbol>
+  <symbol id="i-flip" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+</svg>
+
 <header>
-  <div>
-    <h1>SnapFade</h1>
-    <div class="sub" id="sub"></div>
+  <div class="hrow">
+    <img class="logo" src="icon-180.png" alt="">
+    <div class="ttl">
+      <h1>SnapFade</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="hbtn" id="btnSelect">تحديد</button>
+    <button class="hbtn icon" id="btnSettings" aria-label="الإعدادات"><svg class="ic"><use href="#i-gear"/></svg></button>
   </div>
-  <div class="grow"></div>
-  <button class="hbtn" id="btnSelect">تحديد</button>
-  <button class="hbtn" id="btnSettings" aria-label="الإعدادات">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-  </button>
+  <div class="filters" id="filters"></div>
 </header>
 
 <div class="banner" id="installBanner" hidden>
@@ -168,86 +279,76 @@ main{padding-bottom:calc(var(--sb) + 120px)}
 <main id="main"></main>
 
 <div class="dock" id="dock">
-  <button class="side" id="btnNative">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg>
-    جودة كاملة
-  </button>
-  <button class="fab" id="btnCam" aria-label="تصوير">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
-  </button>
-  <div style="width:104px"></div>
+  <button class="side" id="btnImport"><svg class="ic"><use href="#i-import"/></svg>استيراد</button>
+  <button class="fab" id="btnCam" aria-label="تصوير"><svg class="ic"><use href="#i-cam"/></svg></button>
+  <button class="side" id="btnNative"><svg class="ic"><use href="#i-star"/></svg>جودة كاملة</button>
 </div>
 <input type="file" id="nativeInput" accept="image/*,video/*" capture="environment" multiple hidden>
+<input type="file" id="importInput" accept="image/*,video/*" multiple hidden>
 
-<div class="selbar" id="selbar" hidden>
-  <button class="act" id="selShare">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
-    <span>مشاركة</span>
-  </button>
-  <button class="act" id="selKeep">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
-    <span>استثناء من الحذف</span>
-  </button>
-  <button class="act danger" id="selDelete">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
-    <span>حذف</span>
-  </button>
+<div class="selbar" id="selbar">
+  <button class="act" id="selShare"><svg class="ic"><use href="#i-share"/></svg><span>مشاركة</span></button>
+  <button class="act" id="selAlbum"><svg class="ic"><use href="#i-folder"/></svg><span>ألبوم</span></button>
+  <button class="act" id="selKeep"><svg class="ic"><use href="#i-keep"/></svg><span>حفظ</span></button>
+  <button class="act" id="selRenew"><svg class="ic"><use href="#i-renew"/></svg><span>تجديد</span></button>
+  <button class="act danger" id="selDelete"><svg class="ic"><use href="#i-trash"/></svg><span>حذف</span></button>
 </div>
 
 <div id="cam" hidden>
-  <div class="top">
+  <div class="camtop">
     <button class="pill" id="camClose">تم</button>
+    <div class="pill" id="camAlbum" hidden><svg class="ic" style="width:15px;height:15px"><use href="#i-folder"/></svg><span></span></div>
+    <div class="grow"></div>
     <div class="pill" id="rec" hidden>00:00</div>
+    <button class="pill icon" id="camTorch" aria-label="فلاش" hidden><svg class="ic"><use href="#i-bolt"/></svg></button>
+    <button class="pill icon" id="camGrid" aria-label="شبكة"><svg class="ic"><use href="#i-grid"/></svg></button>
   </div>
-  <video id="camVideo" playsinline muted autoplay></video>
-  <div id="flash"></div>
-  <div class="bottom">
+  <div id="camView">
+    <video id="camVideo" playsinline muted autoplay></video>
+    <div id="gridLines"></div>
+    <div id="flash"></div>
+    <button class="pill" id="camZoom">1×</button>
+  </div>
+  <div class="cambottom">
     <div class="modes">
       <button id="modePhoto" class="on">صورة</button>
       <button id="modeVideo">فيديو</button>
     </div>
-    <div class="row">
+    <div class="camrow">
       <div class="last" id="camLast"><span id="camCount" hidden>0</span></div>
       <button id="shutter" aria-label="التقاط"><i></i></button>
-      <button class="round" id="camFlip" aria-label="تبديل الكاميرا">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"/></svg>
-      </button>
+      <button class="round" id="camFlip" aria-label="تبديل الكاميرا"><svg class="ic"><use href="#i-flip"/></svg></button>
     </div>
   </div>
 </div>
 
 <div id="viewer" hidden>
-  <div class="top">
+  <div class="vbg" id="vbg"></div>
+  <div class="vtop">
     <button class="pill" id="vClose">رجوع</button>
-    <div class="info" id="vInfo"></div>
+    <div class="vinfo"><b id="vCount"></b><div id="vInfo"></div></div>
   </div>
-  <div class="stage" id="vStage"></div>
-  <div class="bar">
-    <button class="act" id="vShare">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
-      <span>مشاركة</span>
-    </button>
-    <button class="act" id="vKeep">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
-      <span id="vKeepLabel">استثناء من الحذف</span>
-    </button>
-    <button class="act danger" id="vDelete">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
-      <span>حذف</span>
-    </button>
+  <div class="stage" id="vStage"><div id="vWrap"></div></div>
+  <div class="vbar">
+    <button class="act" id="vShare"><svg class="ic"><use href="#i-share"/></svg><span>مشاركة</span></button>
+    <button class="act" id="vKeep"><svg class="ic"><use href="#i-keep"/></svg><span id="vKeepLabel">حفظ</span></button>
+    <button class="act" id="vRenew"><svg class="ic"><use href="#i-renew"/></svg><span>تجديد</span></button>
+    <button class="act danger" id="vDelete"><svg class="ic"><use href="#i-trash"/></svg><span>حذف</span></button>
   </div>
 </div>
 
 <div class="scrim" id="settings" hidden>
   <div class="sheet">
+    <div class="grab"></div>
     <h2>الإعدادات</h2>
     <h3>اللغة</h3>
     <div class="chips" id="langChips"></div>
     <h3>الحذف التلقائي بعد</h3>
     <div class="chips" id="chips"></div>
     <div class="custom">مدة أخرى: <input id="customDays" type="number" inputmode="numeric" min="1" max="3650"> يوم</div>
-    <p style="margin-top:10px">أي صورة أو فيديو أقدم من هذه المدة ينحذف تلقائياً عند فتح التطبيق. العناصر المستثناة لا تنحذف.</p>
+    <p style="margin-top:10px">أي صورة أو فيديو أقدم من هذه المدة ينحذف تلقائياً عند فتح التطبيق. العناصر المحفوظة لا تنحذف، وزر "تجديد" يعيد العدّاد من جديد.</p>
     <h3>التخزين</h3>
+    <div class="bar"><i id="stBar"></i></div>
     <div class="stat"><span>عدد العناصر</span><span id="stCount"></span></div>
     <div class="stat"><span>الحجم</span><span id="stSize"></span></div>
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
@@ -256,40 +357,61 @@ main{padding-bottom:calc(var(--sb) + 120px)}
   </div>
 </div>
 
-<div id="toast" hidden></div>
+<div class="scrim" id="albumSheet" hidden>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="albumTitle"></h2>
+    <div class="alist" id="albumList"></div>
+    <div class="addrow">
+      <input id="albumName" maxlength="40" enterkeyhint="done" placeholder="اسم ألبوم جديد (مثلاً: كامري 2020)">
+      <button class="hbtn on" id="albumAdd">إضافة</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><span></span><button hidden></button></div>
 
 <script>
 const DAY = 86400000;
 const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const PRESETS = [[7,'أسبوع'],[14,'أسبوعين'],[30,'شهر'],[60,'شهرين'],[90,'3 أشهر'],[0,'بدون حذف']];
 
 /* ---------- language ---------- */
 const LANG = localStorage.getItem('lang') || ((navigator.language || 'en').toLowerCase().startsWith('ar') ? 'ar' : 'en');
 document.documentElement.lang = LANG;
 document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+const DIR = LANG === 'ar' ? -1 : 1;
 const items_en = n => n + (n === 1 ? ' item' : ' items');
 // Arabic text is the key; English is looked up here.
 const EN = {
   'تحديد':'Select', 'إلغاء':'Cancel', 'الإعدادات':'Settings', 'إغلاق':'Close', 'جودة كاملة':'Full quality',
-  'تصوير':'Capture', 'مشاركة':'Share', 'استثناء من الحذف':'Keep', 'إلغاء الاستثناء':"Don't keep", 'حذف':'Delete',
-  'تم':'Done', 'صورة':'Photo', 'فيديو':'Video', 'التقاط':'Shutter', 'تبديل الكاميرا':'Switch camera', 'رجوع':'Back',
+  'استيراد':'Import', 'تصوير':'Capture', 'مشاركة':'Share', 'ألبوم':'Album', 'حفظ':'Keep', 'إلغاء الحفظ':'Unkeep',
+  'تجديد':'Renew', 'حذف':'Delete', 'تم':'Done', 'صورة':'Photo', 'فيديو':'Video', 'التقاط':'Shutter',
+  'تبديل الكاميرا':'Switch camera', 'فلاش':'Torch', 'شبكة':'Grid', 'رجوع':'Back', 'إضافة':'Add',
   'اللغة':'Language', 'الحذف التلقائي بعد':'Auto-delete after', 'مدة أخرى:':'Custom:', 'يوم':'days',
-  'أي صورة أو فيديو أقدم من هذه المدة ينحذف تلقائياً عند فتح التطبيق. العناصر المستثناة لا تنحذف.':
-    'Any photo or video older than this is deleted automatically when you open the app. Kept items are never deleted.',
+  'أي صورة أو فيديو أقدم من هذه المدة ينحذف تلقائياً عند فتح التطبيق. العناصر المحفوظة لا تنحذف، وزر "تجديد" يعيد العدّاد من جديد.':
+    'Any photo or video older than this is deleted automatically when you open the app. Kept items are never deleted, and "Renew" restarts the countdown.',
   'التخزين':'Storage', 'عدد العناصر':'Items', 'الحجم':'Size', 'حماية التخزين':'Storage protection',
   'حذف كل شيء الآن':'Delete everything now',
   'أسبوع':'1 week', 'أسبوعين':'2 weeks', 'شهر':'1 month', 'شهرين':'2 months', '3 أشهر':'3 months', 'بدون حذف':'Never',
   'اليوم':'Today', 'أمس':'Yesterday', 'محفوظ':'Kept', '{n} يوم':'{n}d',
+  'الكل':'All', 'قريب الحذف':'Expiring', 'تحديد الكل':'Select all', 'تراجع':'Undo',
   '{n} عنصر': p => items_en(p.n),
   'الحذف بعد {n} يوم':'Deleted after {n} days', 'بدون حذف تلقائي':'No auto-delete',
   'ما في صور بعد.<br>صوّر من هنا والصور تبقى داخل التطبيق فقط،<br>بعيدة عن صورك الشخصية.':
     'No photos yet.<br>Shoot here and everything stays inside the app,<br>away from your personal photos.',
+  'هذا الألبوم فارغ.<br>أي شيء تصوّره الآن ينحفظ فيه.':'This album is empty.<br>Anything you shoot now is saved into it.',
+  'لا يوجد شيء هنا.':'Nothing here.', 'حذف الألبوم':'Delete album',
   'للحفاظ على الصور ثبّت التطبيق: اكبس زر <b>المشاركة</b> في Safari ثم <b>إضافة إلى الشاشة الرئيسية</b>.':
     'To keep your photos safe, install the app: tap <b>Share</b> in Safari, then <b>Add to Home Screen</b>.',
   'مشاركة ({n})':'Share ({n})', 'لحظة، جاري التجهيز…':'One moment, preparing…',
-  'حذف {n} عنصر نهائياً؟': p => 'Permanently delete ' + items_en(p.n) + '?',
-  'تعذّرت المشاركة':'Sharing failed', 'الملف غير موجود':'File not found', 'مستثنى من الحذف':'Kept',
-  'ينحذف بعد {n} يوم':'Deleted in {n} days', 'حذف هذا العنصر نهائياً؟':'Permanently delete this item?',
+  'تم حذف {n} عنصر': p => items_en(p.n) + ' deleted',
+  'تعذّرت المشاركة':'Sharing failed', 'الملف غير موجود':'File not found',
+  'ينحذف بعد {n} يوم':'Deleted in {n} days', 'تم تجديد المدة':'Countdown restarted',
+  'نقل إلى ألبوم':'Move to album', 'ألبوم جديد':'New album', 'بدون ألبوم':'No album', 'تم النقل':'Moved',
+  'اسم ألبوم جديد (مثلاً: كامري 2020)':'New album name (e.g. Camry 2020)',
   'ما قدرت أفتح الكاميرا. تأكد من الإذن أو استخدم "جودة كاملة"':'Could not open the camera. Check the permission or use "Full quality"',
   'تعذّر تشغيل الكاميرا':'Could not start the camera', 'فشل الالتقاط':'Capture failed',
   'فشل الحفظ: المساحة ممتلئة؟':'Save failed: storage full?',
@@ -299,31 +421,50 @@ const EN = {
   'تم حفظ {n} عنصر': p => 'Saved ' + items_en(p.n),
   'هذه المدة ستحذف {n} عنصر موجود الآن. متابعة؟': p => 'This will delete ' + items_en(p.n) + ' right now. Continue?',
   'مفعّلة':'On', 'غير مفعّلة':'Off',
-  'حذف كل الصور والفيديوهات ({n}) نهائياً، حتى المستثناة؟':'Permanently delete all {n} photos and videos, including kept ones?',
+  'حذف كل الصور والفيديوهات ({n}) نهائياً، حتى المحفوظة؟':'Permanently delete all {n} photos and videos, including kept ones?',
   'تعذّر فتح التخزين. إذا كنت في التصفح الخاص، افتح التطبيق في نافذة عادية.':
     'Could not open storage. If you are in Private Browsing, open the app in a normal window.',
   'تم حذف {n} عنصر قديم تلقائياً': p => items_en(p.n).replace(' item', ' old item') + ' deleted automatically',
 };
 function t(key, p){
-  let v = LANG === 'en' && EN[key] !== undefined ? EN[key] : key;
+  const v = LANG === 'en' && EN[key] !== undefined ? EN[key] : key;
   if (typeof v === 'function') return v(p);
   return p ? v.replace('{n}', p.n) : v;
 }
 if (LANG === 'en'){
   const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   for (let n; (n = w.nextNode());){ const k = n.nodeValue.trim(); if (typeof EN[k] === 'string') n.nodeValue = EN[k]; }
-  document.querySelectorAll('[aria-label]').forEach(e => {
-    const k = e.getAttribute('aria-label'); if (typeof EN[k] === 'string') e.setAttribute('aria-label', EN[k]);
-  });
+  for (const attr of ['aria-label', 'placeholder'])
+    document.querySelectorAll('[' + attr + ']').forEach(e => {
+      const k = e.getAttribute(attr); if (typeof EN[k] === 'string') e.setAttribute(attr, EN[k]);
+    });
 }
 
 let db, items = [];
+let filter = 'all';           // 'all' | 'soon' | 'kept' | 'a:<album>'
 let selecting = false;
 const selected = new Map();   // id -> File (null while loading)
-let viewing = null;           // {meta, file, url}
+let pending = null;           // deletion waiting for its undo window: {ids:Set, timer}
+let firstPaint = true;
+const fresh = new Set();      // ids that should pop in on the next render
 
 const getDays = () => { const v = localStorage.getItem('days'); return v === null ? 30 : +v; };
 const setDays = v => localStorage.setItem('days', String(v));
+
+/* ---------- layers ---------- */
+function show(el){ clearTimeout(el._h); el.hidden = false; void el.offsetWidth; el.classList.add('open'); }
+function hide(el, ms = 240){ el.classList.remove('open'); el._h = setTimeout(() => el.hidden = true, ms); }
+const isOpen = el => el.classList.contains('open');
+let toastTimer;
+function hideToast(){ $('toast').classList.remove('show'); }
+function toast(msg, opt = {}){
+  const el = $('toast'), b = el.lastElementChild;
+  el.firstElementChild.textContent = msg;
+  b.hidden = !opt.action; b.textContent = opt.action || '';
+  b.onclick = () => { hideToast(); opt.onAction(); };
+  el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, opt.ms || 2800);
+}
 
 /* ---------- storage ---------- */
 function openDB(){
@@ -339,55 +480,82 @@ function openDB(){
 }
 function run(stores, mode, fn){
   return new Promise((res, rej) => {
-    const t = db.transaction(stores, mode);
+    const tx = db.transaction(stores, mode);
     let out;
-    t.oncomplete = () => res(out);
-    t.onerror = t.onabort = () => rej(t.error);
-    fn(t, v => out = v);
+    tx.oncomplete = () => res(out);
+    tx.onerror = tx.onabort = () => rej(tx.error);
+    fn(tx, v => out = v);
   });
 }
-const loadItems = () => run(['items'], 'readonly', (t, set) => {
-  const r = t.objectStore('items').getAll();
-  r.onsuccess = () => set(r.result.sort((a, b) => b.createdAt - a.createdAt));
+const byDate = (a, b) => b.createdAt - a.createdAt;
+const loadItems = () => run(['items'], 'readonly', (tx, set) => {
+  const r = tx.objectStore('items').getAll();
+  r.onsuccess = () => set(r.result.sort(byDate));
 });
-const getBlob = id => run(['blobs'], 'readonly', (t, set) => {
-  const r = t.objectStore('blobs').get(id);
+const getBlob = id => run(['blobs'], 'readonly', (tx, set) => {
+  const r = tx.objectStore('blobs').get(id);
   r.onsuccess = () => set(r.result);
 });
-async function addItem(blob, type, thumb){
-  if (!thumb) thumb = await makeThumb(blob, type).catch(() => null);
-  const meta = {type, mime: blob.type, size: blob.size, createdAt: Date.now(), keep: false, thumb};
-  await run(['items','blobs'], 'readwrite', t => {
-    const r = t.objectStore('items').add(meta);
-    r.onsuccess = () => { meta.id = r.result; t.objectStore('blobs').put(blob, meta.id); };
+async function addItem(blob, type, opt = {}){
+  const thumb = opt.thumb || await makeThumb(blob, type).catch(() => null);
+  const now = Date.now();
+  // createdAt places it in the timeline; base is where the auto-delete countdown starts.
+  const meta = {type, mime: blob.type, size: blob.size, createdAt: opt.createdAt || now, base: now,
+    keep: false, album: captureAlbum(), thumb};
+  await run(['items','blobs'], 'readwrite', tx => {
+    const r = tx.objectStore('items').add(meta);
+    r.onsuccess = () => { meta.id = r.result; tx.objectStore('blobs').put(blob, meta.id); };
   });
-  items.unshift(meta);
+  items.push(meta); items.sort(byDate);
+  fresh.add(meta.id);
   render();
   return meta;
 }
 async function removeItems(ids){
-  await run(['items','blobs'], 'readwrite', t => {
-    for (const id of ids){ t.objectStore('items').delete(id); t.objectStore('blobs').delete(id); }
+  await run(['items','blobs'], 'readwrite', tx => {
+    for (const id of ids){ tx.objectStore('items').delete(id); tx.objectStore('blobs').delete(id); }
   });
   const gone = new Set(ids);
   items = items.filter(i => !gone.has(i.id));
   render();
 }
-async function setKeep(ids, keep){
+async function patch(ids, change){
   const set = new Set(ids);
-  await run(['items'], 'readwrite', t => {
-    for (const m of items) if (set.has(m.id)){ m.keep = keep; t.objectStore('items').put(m); }
+  await run(['items'], 'readwrite', tx => {
+    for (const m of items) if (set.has(m.id)){ Object.assign(m, change); tx.objectStore('items').put(m); }
   });
   render();
 }
+const baseOf = m => m.base || m.createdAt;
 async function cleanup(){
   const d = getDays();
   if (!d) return;
   const cut = Date.now() - d * DAY;
-  const old = items.filter(i => !i.keep && i.createdAt < cut).map(i => i.id);
+  const old = items.filter(i => !i.keep && baseOf(i) < cut).map(i => i.id);
   if (!old.length) return;
   await removeItems(old);
   toast(t('تم حذف {n} عنصر قديم تلقائياً', {n: old.length}));
+}
+
+/* ---------- delete with undo ---------- */
+async function commitPending(){
+  if (!pending) return;
+  const ids = [...pending.ids];
+  clearTimeout(pending.timer); pending = null;
+  await removeItems(ids);
+}
+async function softDelete(ids){
+  await commitPending();
+  for (const id of ids) document.querySelector('.cell[data-id="' + id + '"]')?.classList.add('out');
+  await sleep(200);
+  pending = {ids: new Set(ids), timer: setTimeout(commitPending, 5000)};
+  render();
+  toast(t('تم حذف {n} عنصر', {n: ids.length}), {action: t('تراجع'), ms: 5000, onAction(){
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    for (const id of pending.ids) fresh.add(id);
+    pending = null; render();
+  }});
 }
 
 /* ---------- thumbnails ---------- */
@@ -417,18 +585,91 @@ function makeThumb(blob, type){
   });
 }
 
+/* ---------- albums & filters ---------- */
+const savedAlbums = () => JSON.parse(localStorage.getItem('albums') || '[]');
+function albums(){
+  const s = new Set(savedAlbums());
+  for (const i of items) if (i.album) s.add(i.album);
+  return [...s];
+}
+const captureAlbum = () => filter.startsWith('a:') ? filter.slice(2) : '';
+const live = () => pending ? items.filter(i => !pending.ids.has(i.id)) : items;
+const isSoon = m => { const l = daysLeft(m); return !m.keep && l !== null && l <= 3; };
+function view(){
+  const L = live();
+  if (filter === 'soon') return L.filter(isSoon);
+  if (filter === 'kept') return L.filter(i => i.keep);
+  if (filter.startsWith('a:')) return L.filter(i => i.album === filter.slice(2));
+  return L;
+}
+function renderFilters(){
+  const L = live(), defs = [['all', t('الكل'), L.length]];
+  const soon = L.filter(isSoon).length, kept = L.filter(i => i.keep).length;
+  if (soon) defs.push(['soon', t('قريب الحذف'), soon]);
+  if (kept) defs.push(['kept', t('محفوظ'), kept]);
+  for (const a of albums()) defs.push(['a:' + a, a, L.filter(i => i.album === a).length]);
+  if (!defs.some(d => d[0] === filter)) filter = 'all';
+  const nodes = defs.map(([key, label, n]) => {
+    const b = document.createElement('button');
+    b.className = 'fchip' + (key === filter ? ' on' : '');
+    b.append(label);
+    const c = document.createElement('i'); c.textContent = n; b.append(c);
+    b.onclick = () => { if (filter !== key){ filter = key; if (selecting) setSelecting(false); else render(); } };
+    return b;
+  });
+  const add = document.createElement('button');
+  add.className = 'fchip add'; add.textContent = '+'; add.setAttribute('aria-label', t('ألبوم جديد'));
+  add.onclick = () => openAlbumSheet('create');
+  $('filters').replaceChildren(...nodes, add);
+}
+let albumMode = 'create';
+function openAlbumSheet(mode){
+  albumMode = mode;
+  $('albumTitle').textContent = t(mode === 'move' ? 'نقل إلى ألبوم' : 'ألبوم جديد');
+  const rows = mode === 'move' ? ['', ...albums()].map(a => {
+    const b = document.createElement('button');
+    b.className = 'arow';
+    b.innerHTML = '<svg class="ic"><use href="#i-folder"/></svg>';
+    b.append(a || t('بدون ألبوم'));
+    b.onclick = () => pickAlbum(a);
+    return b;
+  }) : [];
+  $('albumList').replaceChildren(...rows);
+  $('albumName').value = '';
+  show($('albumSheet'));
+}
+async function pickAlbum(name){
+  hide($('albumSheet'));
+  if (albumMode === 'move'){
+    await patch([...selected.keys()], {album: name});
+    setSelecting(false);
+    toast(t('تم النقل'));
+  } else { filter = 'a:' + name; render(); }
+}
+$('albumAdd').onclick = () => {
+  const name = $('albumName').value.trim();
+  if (!name) return $('albumName').focus();
+  const list = savedAlbums();
+  if (!list.includes(name)){ list.push(name); localStorage.setItem('albums', JSON.stringify(list)); }
+  $('albumName').blur();
+  pickAlbum(name);
+};
+$('albumName').onkeydown = e => { if (e.key === 'Enter') $('albumAdd').click(); };
+$('albumSheet').onclick = e => { if (e.target === $('albumSheet')) hide($('albumSheet')); };
+
 /* ---------- gallery ---------- */
 const pad = n => String(n).padStart(2, '0');
+const LOCALE = LANG === 'ar' ? 'ar-u-nu-latn' : 'en';
 function dayLabel(ts){
   const d = new Date(ts), today = new Date(); today.setHours(0,0,0,0);
   const diff = Math.round((today - new Date(d).setHours(0,0,0,0)) / DAY);
   if (diff === 0) return t('اليوم');
   if (diff === 1) return t('أمس');
-  return d.toLocaleDateString(LANG === 'ar' ? 'ar-u-nu-latn' : 'en', {weekday:'long', day:'numeric', month:'long'});
+  return d.toLocaleDateString(LOCALE, {weekday:'long', day:'numeric', month:'long'});
 }
 function daysLeft(m){
   const d = getDays();
-  return d ? Math.max(0, Math.ceil((m.createdAt + d * DAY - Date.now()) / DAY)) : null;
+  return d ? Math.max(0, Math.ceil((baseOf(m) + d * DAY - Date.now()) / DAY)) : null;
 }
 function fmtSize(b){
   return b > 1e9 ? (b / 1e9).toFixed(2) + ' GB' : b > 1e6 ? (b / 1e6).toFixed(1) + ' MB' : Math.round(b / 1e3) + ' KB';
@@ -436,28 +677,43 @@ function fmtSize(b){
 const PLAY = '<svg viewBox="0 0 10 10" fill="#fff"><path d="M2 1l7 4-7 4z"/></svg>';
 
 function render(){
-  const main = $('main');
-  main.textContent = '';
+  renderFilters();
+  const main = $('main'), list = view(), total = live().length, d = getDays();
   main.classList.toggle('selecting', selecting);
-  const d = getDays();
   const rule = d ? t('الحذف بعد {n} يوم', {n: d}) : t('بدون حذف تلقائي');
-  $('sub').textContent = items.length ? t('{n} عنصر', {n: items.length}) + ' · ' + rule : rule;
-  $('btnSelect').hidden = !items.length;
+  $('sub').textContent = total ? t('{n} عنصر', {n: total}) + ' · ' + rule : rule;
+  $('btnSelect').hidden = !list.length && !selecting;
 
-  if (!items.length){
-    main.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><div>' + t('ما في صور بعد.<br>صوّر من هنا والصور تبقى داخل التطبيق فقط،<br>بعيدة عن صورك الشخصية.') + '</div></div>';
+  if (!list.length){
+    const inAlbum = filter.startsWith('a:');
+    const msg = !total && !inAlbum ? t('ما في صور بعد.<br>صوّر من هنا والصور تبقى داخل التطبيق فقط،<br>بعيدة عن صورك الشخصية.')
+      : inAlbum ? t('هذا الألبوم فارغ.<br>أي شيء تصوّره الآن ينحفظ فيه.') : t('لا يوجد شيء هنا.');
+    main.innerHTML = '<div class="empty"><img src="icon-180.png" alt=""><div>' + msg + '</div>'
+      + (inAlbum ? '<button class="wide danger" id="albumDel">' + t('حذف الألبوم') + '</button>' : '') + '</div>';
+    if (inAlbum) $('albumDel').onclick = () => {
+      localStorage.setItem('albums', JSON.stringify(savedAlbums().filter(a => a !== filter.slice(2))));
+      filter = 'all'; render();
+    };
+    firstPaint = false; fresh.clear();
     return;
   }
-  let label, grid;
-  for (const m of items){
+  const frag = document.createDocumentFragment();
+  let label, grid, n = 0;
+  for (const m of list){
     const l = dayLabel(m.createdAt);
     if (l !== label){
       label = l;
-      const h = document.createElement('div'); h.className = 'day'; h.textContent = l; main.append(h);
-      grid = document.createElement('div'); grid.className = 'grid'; main.append(grid);
+      const h = document.createElement('div'); h.className = 'day';
+      const s = document.createElement('span'); s.textContent = l;
+      const all = document.createElement('button'); all.className = 'dayall'; all.textContent = t('تحديد الكل');
+      h.append(s, all); frag.append(h);
+      grid = document.createElement('div'); grid.className = 'grid'; frag.append(grid);
     }
     const c = document.createElement('button');
     c.className = 'cell' + (selected.has(m.id) ? ' sel' : '');
+    if (fresh.has(m.id)) c.classList.add('pop');
+    else if (firstPaint && n < 15){ c.classList.add('in'); c.style.setProperty('--i', n); }
+    n++;
     c.dataset.id = m.id;
     if (m.thumb){ const img = new Image(); img.src = m.thumb; img.alt = ''; c.append(img); }
     else c.insertAdjacentHTML('beforeend', '<div class="ph">' + t(m.type === 'video' ? 'فيديو' : 'صورة') + '</div>');
@@ -468,14 +724,23 @@ function render(){
     c.insertAdjacentHTML('beforeend', '<div class="check"></div>');
     grid.append(c);
   }
+  main.replaceChildren(frag);
+  firstPaint = false; fresh.clear();
   updateSelBar();
 }
 
 $('main').addEventListener('click', e => {
+  const all = e.target.closest('.dayall');
+  if (all){
+    const cells = [...all.parentElement.nextElementSibling.children];
+    const want = !cells.every(c => selected.has(+c.dataset.id));
+    for (const c of cells) if (selected.has(+c.dataset.id) !== want) toggleSelect(+c.dataset.id, c);
+    return;
+  }
   const c = e.target.closest('.cell');
   if (!c) return;
   const id = +c.dataset.id;
-  if (selecting) toggleSelect(id, c); else openViewer(id);
+  if (selecting) toggleSelect(id, c); else openViewer(id, c);
 });
 
 /* ---------- selection ---------- */
@@ -493,8 +758,8 @@ function setSelecting(on){
   if (!on) selected.clear();
   $('btnSelect').textContent = t(on ? 'إلغاء' : 'تحديد');
   $('btnSelect').classList.toggle('on', on);
-  $('selbar').hidden = !on;
-  $('dock').hidden = on;
+  $('selbar').classList.toggle('show', on);
+  $('dock').classList.toggle('away', on);
   render();
 }
 // Files are loaded on selection so that share() can run synchronously inside the tap (iOS requirement).
@@ -503,17 +768,17 @@ function toggleSelect(id, cell){
   else {
     selected.set(id, null);
     const m = items.find(i => i.id === id);
-    getBlob(id).then(b => { if (b && selected.has(id)) selected.set(id, fileFor(m, b)); updateSelBar(); });
+    getBlob(id).then(b => { if (b && selected.has(id)) selected.set(id, fileFor(m, b)); });
   }
   cell.classList.toggle('sel', selected.has(id));
   updateSelBar();
 }
+const allKept = () => selected.size && [...selected.keys()].every(id => items.find(i => i.id === id)?.keep);
 function updateSelBar(){
   const n = selected.size;
-  for (const id of ['selShare','selKeep','selDelete']) $(id).disabled = !n;
+  for (const id of ['selShare','selAlbum','selKeep','selRenew','selDelete']) $(id).disabled = !n;
   $('selShare').lastElementChild.textContent = n ? t('مشاركة ({n})', {n}) : t('مشاركة');
-  const allKept = n && [...selected.keys()].every(id => items.find(i => i.id === id)?.keep);
-  $('selKeep').lastElementChild.textContent = t(allKept ? 'إلغاء الاستثناء' : 'استثناء من الحذف');
+  $('selKeep').lastElementChild.textContent = t(allKept() ? 'إلغاء الحفظ' : 'حفظ');
 }
 $('btnSelect').onclick = () => setSelecting(!selecting);
 $('selShare').onclick = () => {
@@ -521,17 +786,13 @@ $('selShare').onclick = () => {
   if (files.some(f => !f)) return toast(t('لحظة، جاري التجهيز…'));
   share(files);
 };
-$('selKeep').onclick = async () => {
-  const ids = [...selected.keys()];
-  const allKept = ids.every(id => items.find(i => i.id === id)?.keep);
-  await setKeep(ids, !allKept);
-  setSelecting(false);
+$('selAlbum').onclick = () => openAlbumSheet('move');
+$('selKeep').onclick = async () => { await patch([...selected.keys()], {keep: !allKept()}); setSelecting(false); };
+$('selRenew').onclick = async () => {
+  await patch([...selected.keys()], {base: Date.now()});
+  setSelecting(false); toast(t('تم تجديد المدة'));
 };
-$('selDelete').onclick = async () => {
-  if (!confirm(t('حذف {n} عنصر نهائياً؟', {n: selected.size}))) return;
-  await removeItems([...selected.keys()]);
-  setSelecting(false);
-};
+$('selDelete').onclick = () => { const ids = [...selected.keys()]; setSelecting(false); softDelete(ids); };
 
 /* ---------- share ---------- */
 async function share(files){
@@ -548,49 +809,188 @@ async function share(files){
 }
 
 /* ---------- viewer ---------- */
-async function openViewer(id){
-  const m = items.find(i => i.id === id);
-  const blob = await getBlob(id);
-  if (!m || !blob) return toast(t('الملف غير موجود'));
+let viewing = null;           // {meta, file, url, el}
+let zoom = {s: 1, x: 0, y: 0};
+let vBusy = false, g = null, lastTap = 0;
+const stage = $('vStage'), wrap = $('vWrap'), V = $('viewer');
+
+async function loadMedia(m){
+  const blob = await getBlob(m.id);
+  if (!blob) return null;
   const url = URL.createObjectURL(blob);
-  viewing = {meta: m, file: fileFor(m, blob), url};
   const el = document.createElement(m.type === 'video' ? 'video' : 'img');
-  el.src = url;
-  if (m.type === 'video'){ el.controls = true; el.playsInline = true; }
-  $('vStage').replaceChildren(el);
+  el.src = url; el.draggable = false;
+  if (m.type === 'video'){
+    el.controls = true; el.playsInline = true;
+    await new Promise(r => { el.onloadedmetadata = r; el.onerror = r; setTimeout(r, 1500); });
+  } else await el.decode().catch(() => {});
+  return {meta: m, file: fileFor(m, blob), url, el};
+}
+function mount(v){
+  if (viewing) URL.revokeObjectURL(viewing.url);
+  viewing = v; zoom = {s: 1, x: 0, y: 0};
+  wrap.replaceChildren(v.el);
   viewerInfo();
-  $('viewer').hidden = false;
+}
+// Transform that places the full-size media over a grid cell (for the open/close morph).
+function toCell(rect){
+  const el = viewing.el, s = stage.getBoundingClientRect();
+  if (!rect || !el.offsetWidth) return '';
+  const k = Math.max(rect.width / el.offsetWidth, rect.height / el.offsetHeight);
+  return 'translate(' + (rect.left + rect.width / 2 - s.left - s.width / 2) + 'px,'
+    + (rect.top + rect.height / 2 - s.top - s.height / 2) + 'px) scale(' + k + ')';
+}
+async function openViewer(id, cell){
+  if (vBusy) return;
+  const m = items.find(i => i.id === id);
+  vBusy = true;
+  const v = m && await loadMedia(m);
+  vBusy = false;
+  if (!v) return toast(t('الملف غير موجود'));
+  clearTimeout(V._h); V.hidden = false;
+  mount(v);
+  const from = toCell(cell?.getBoundingClientRect());
+  if (from){ wrap.style.transition = 'none'; wrap.style.transform = from; void wrap.offsetWidth; wrap.style.transition = ''; }
+  wrap.style.transform = '';
+  V.classList.add('open');
 }
 function viewerInfo(){
-  const m = viewing.meta, left = daysLeft(m);
-  $('vInfo').textContent = fmtSize(m.size) + ' · ' + (m.keep ? t('مستثنى من الحذف') : left === null ? t('بدون حذف تلقائي') : t('ينحذف بعد {n} يوم', {n: left}));
-  $('vKeepLabel').textContent = t(m.keep ? 'إلغاء الاستثناء' : 'استثناء من الحذف');
+  const m = viewing.meta, left = daysLeft(m), list = view();
+  $('vCount').textContent = (list.findIndex(i => i.id === m.id) + 1) + ' / ' + list.length;
+  const when = new Date(m.createdAt).toLocaleString(LOCALE, {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'});
+  const exp = m.keep ? t('محفوظ') : left === null ? t('بدون حذف تلقائي') : t('ينحذف بعد {n} يوم', {n: left});
+  $('vInfo').textContent = when + ' · ' + fmtSize(m.size) + ' · ' + exp;
+  $('vKeepLabel').textContent = t(m.keep ? 'إلغاء الحفظ' : 'حفظ');
+  $('vKeep').style.color = m.keep ? 'var(--accent)' : '';
 }
 function closeViewer(){
   if (!viewing) return;
-  $('vStage').replaceChildren();
-  URL.revokeObjectURL(viewing.url);
+  const v = viewing;
+  v.el.style.transform = '';
+  const r = document.querySelector('.cell[data-id="' + v.meta.id + '"]')?.getBoundingClientRect();
+  const back = r && r.bottom > 0 && r.top < innerHeight ? toCell(r) : '';
+  V.classList.remove('open', 'drag');
+  $('vbg').style.opacity = '';
+  wrap.style.transform = back || 'scale(.9)';
+  if (!back) wrap.style.opacity = 0;
   viewing = null;
-  $('viewer').hidden = true;
+  V._h = setTimeout(() => {
+    V.hidden = true; wrap.replaceChildren(); wrap.style.transform = ''; wrap.style.opacity = '';
+    URL.revokeObjectURL(v.url);
+  }, 300);
 }
+// delta: +1 is the next (older) item; sign: the side the current one leaves to.
+async function go(delta, sign){
+  const list = view(), nx = list[list.findIndex(i => i.id === viewing.meta.id) + delta];
+  if (!nx){ wrap.style.transform = ''; return; }
+  vBusy = true;
+  wrap.style.transform = 'translateX(' + sign * 100 + '%)';
+  const [v] = await Promise.all([loadMedia(nx), sleep(170)]);
+  vBusy = false;
+  if (!v || !viewing){ wrap.style.transform = ''; return; }
+  mount(v);
+  wrap.style.transition = 'none'; wrap.style.transform = 'translateX(' + -sign * 100 + '%)';
+  void wrap.offsetWidth;
+  wrap.style.transition = ''; wrap.style.transform = '';
+}
+const step = delta => go(delta, -delta * DIR);
+
+function applyZoom(){
+  const el = viewing.el;
+  const mx = Math.max(0, (el.offsetWidth * zoom.s - stage.clientWidth) / 2);
+  const my = Math.max(0, (el.offsetHeight * zoom.s - stage.clientHeight) / 2);
+  zoom.x = clamp(zoom.x, -mx, mx); zoom.y = clamp(zoom.y, -my, my);
+  el.style.transform = zoom.s === 1 ? '' : 'translate(' + zoom.x + 'px,' + zoom.y + 'px) scale(' + zoom.s + ')';
+}
+const spread = e => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+stage.addEventListener('touchstart', e => {
+  if (!viewing || vBusy) return;
+  const isImg = viewing.meta.type === 'image';
+  if (e.touches.length === 2 && isImg){ g = {mode: 'pinch', d: spread(e), s0: zoom.s}; V.classList.add('drag'); return; }
+  if (e.touches.length !== 1) return;
+  const p = e.touches[0];
+  // leave the video scrubber alone
+  if (!isImg && p.clientY > stage.getBoundingClientRect().bottom - 70){ g = null; return; }
+  g = {mode: zoom.s > 1 ? 'pan' : 'tap', x0: p.clientX, y0: p.clientY, zx: zoom.x, zy: zoom.y, dx: 0, dy: 0};
+}, {passive: true});
+stage.addEventListener('touchmove', e => {
+  if (!g || !viewing) return;
+  e.preventDefault();
+  if (g.mode === 'pinch'){
+    if (e.touches.length > 1){ zoom.s = clamp(g.s0 * spread(e) / g.d, 1, 5); applyZoom(); }
+    return;
+  }
+  const p = e.touches[0];
+  g.dx = p.clientX - g.x0; g.dy = p.clientY - g.y0;
+  if (g.mode === 'tap'){
+    if (Math.hypot(g.dx, g.dy) < 10) return;
+    g.mode = Math.abs(g.dx) > Math.abs(g.dy) ? 'swipe' : g.dy > 0 ? 'dismiss' : 'none';
+  }
+  V.classList.add('drag');
+  if (g.mode === 'pan'){ zoom.x = g.zx + g.dx; zoom.y = g.zy + g.dy; applyZoom(); }
+  else if (g.mode === 'swipe') wrap.style.transform = 'translateX(' + g.dx + 'px)';
+  else if (g.mode === 'dismiss'){
+    const k = Math.max(0, g.dy);
+    wrap.style.transform = 'translateY(' + k + 'px) scale(' + Math.max(.7, 1 - k / 1200) + ')';
+    $('vbg').style.opacity = Math.max(.2, 1 - k / 400);
+  }
+}, {passive: false});
+function endGesture(){
+  const m = g; g = null;
+  V.classList.remove('drag');
+  if (!m || !viewing) return;
+  if (m.mode === 'pinch'){ if (zoom.s < 1.08) zoom = {s: 1, x: 0, y: 0}; applyZoom(); }
+  else if (m.mode === 'swipe'){
+    if (Math.abs(m.dx) > 60){ const sign = Math.sign(m.dx); go(-sign * DIR, sign); }
+    else wrap.style.transform = '';
+  }
+  else if (m.mode === 'dismiss'){
+    if (m.dy > 110) closeViewer();
+    else { wrap.style.transform = ''; $('vbg').style.opacity = ''; }
+  }
+  else if (m.mode === 'tap' && viewing.meta.type === 'image'){
+    const now = Date.now();
+    if (now - lastTap < 300){
+      const r = stage.getBoundingClientRect();
+      zoom = zoom.s > 1 ? {s: 1, x: 0, y: 0}
+        : {s: 2.5, x: (r.width / 2 - (m.x0 - r.left)) * 1.5, y: (r.height / 2 - (m.y0 - r.top)) * 1.5};
+      applyZoom(); lastTap = 0;
+    } else lastTap = now;
+  }
+}
+stage.addEventListener('touchend', endGesture);
+stage.addEventListener('touchcancel', endGesture);
+document.addEventListener('keydown', e => {
+  if (!viewing || vBusy) return;
+  if (e.key === 'Escape') closeViewer();
+  else if (e.key === 'ArrowRight') step(DIR);
+  else if (e.key === 'ArrowLeft') step(-DIR);
+});
 $('vClose').onclick = closeViewer;
 $('vShare').onclick = () => share([viewing.file]);
-$('vKeep').onclick = async () => { await setKeep([viewing.meta.id], !viewing.meta.keep); viewerInfo(); };
+$('vKeep').onclick = async () => { await patch([viewing.meta.id], {keep: !viewing.meta.keep}); viewerInfo(); };
+$('vRenew').onclick = async () => { await patch([viewing.meta.id], {base: Date.now()}); viewerInfo(); toast(t('تم تجديد المدة')); };
 $('vDelete').onclick = async () => {
-  if (!confirm(t('حذف هذا العنصر نهائياً؟'))) return;
-  const id = viewing.meta.id;
-  closeViewer();
-  await removeItems([id]);
+  if (vBusy) return;
+  const id = viewing.meta.id, list = view(), i = list.findIndex(x => x.id === id);
+  if (list[i + 1]) await step(1); else if (list[i - 1]) await step(-1); else closeViewer();
+  await softDelete([id]);
+  if (viewing) viewerInfo();
 };
 
 /* ---------- camera ---------- */
-let stream = null, facing = 'environment', camMode = 'photo';
+let stream = null, facing = 'environment', camMode = 'photo', camZoom = 1, torch = false;
 let recorder = null, chunks = [], recStart = 0, recTimer = 0, recThumb = null, sessionCount = 0;
-const camVideo = $('camVideo');
+const camVideo = $('camVideo'), cam = $('cam');
 
 function stopStream(){
-  if (stream) stream.getTracks().forEach(t => t.stop());
+  if (stream) stream.getTracks().forEach(tr => tr.stop());
   stream = null; camVideo.srcObject = null;
+}
+function setZoom(z){
+  camZoom = z;
+  camVideo.style.setProperty('--z', z);
+  $('camZoom').textContent = z + '×';
 }
 async function startStream(){
   stopStream();
@@ -599,49 +999,60 @@ async function startStream(){
     audio: camMode === 'video'
   });
   camVideo.srcObject = stream;
-  camVideo.style.transform = facing === 'user' ? 'scaleX(-1)' : '';
+  camVideo.style.setProperty('--m', facing === 'user' ? -1 : 1);
+  torch = false; $('camTorch').classList.remove('on');
+  const caps = stream.getVideoTracks()[0].getCapabilities?.() || {};
+  $('camTorch').hidden = !caps.torch;
   await camVideo.play().catch(() => {});
 }
 async function openCam(){
   if (!navigator.mediaDevices?.getUserMedia) return $('nativeInput').click();
   sessionCount = 0; $('camCount').hidden = true; $('camLast').style.backgroundImage = '';
-  setMode('photo', true);
-  $('cam').hidden = false;
+  const a = captureAlbum();
+  $('camAlbum').hidden = !a; $('camAlbum').lastElementChild.textContent = a;
+  setMode('photo', true); setZoom(1);
+  show(cam);
   try { await startStream(); }
   catch(e){ closeCam(); toast(t('ما قدرت أفتح الكاميرا. تأكد من الإذن أو استخدم "جودة كاملة"')); }
 }
 function closeCam(){
   if (recorder) stopRec();
   stopStream();
-  $('cam').hidden = true;
+  hide(cam);
 }
 function setMode(mode, silent){
   camMode = mode;
   $('modePhoto').classList.toggle('on', mode === 'photo');
   $('modeVideo').classList.toggle('on', mode === 'video');
   $('shutter').classList.toggle('video', mode === 'video');
+  // zoom is a crop of the still frame, so it only applies to photos
+  $('camZoom').hidden = mode === 'video';
+  if (mode === 'video') setZoom(1);
   if (!silent) startStream().catch(() => toast(t('تعذّر تشغيل الكاميرا')));
 }
 function bump(thumb){
   sessionCount++;
   $('camCount').textContent = sessionCount; $('camCount').hidden = false;
-  if (thumb) $('camLast').style.backgroundImage = 'url(' + thumb + ')';
+  const l = $('camLast');
+  if (thumb) l.style.backgroundImage = 'url(' + thumb + ')';
+  l.classList.remove('pop'); void l.offsetWidth; l.classList.add('pop');
 }
 function snap(){
   const w = camVideo.videoWidth, h = camVideo.videoHeight;
   if (!w) return;
-  const c = document.createElement('canvas'); c.width = w; c.height = h;
-  c.getContext('2d').drawImage(camVideo, 0, 0, w, h);
+  const sw = Math.round(w / camZoom), sh = Math.round(h / camZoom);
+  const c = document.createElement('canvas'); c.width = sw; c.height = sh;
+  c.getContext('2d').drawImage(camVideo, (w - sw) / 2, (h - sh) / 2, sw, sh, 0, 0, sw, sh);
   const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
-  const thumb = square(camVideo, w, h);
+  const thumb = square(c, sw, sh);
   c.toBlob(async b => {
     if (!b) return toast(t('فشل الالتقاط'));
-    try { await addItem(b, 'image', thumb); bump(thumb); }
+    try { await addItem(b, 'image', {thumb}); bump(thumb); }
     catch(e){ toast(t('فشل الحفظ: المساحة ممتلئة؟')); }
   }, 'image/jpeg', .93);
 }
 function startRec(){
-  const mime = ['video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t));
+  const mime = ['video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(x => window.MediaRecorder && MediaRecorder.isTypeSupported(x));
   if (!mime) return toast(t('تسجيل الفيديو غير مدعوم هنا، استخدم "جودة كاملة"'));
   chunks = [];
   recThumb = camVideo.videoWidth ? square(camVideo, camVideo.videoWidth, camVideo.videoHeight) : null;
@@ -650,7 +1061,7 @@ function startRec(){
   recorder.onstop = async () => {
     const b = new Blob(chunks, {type: mime.split(';')[0]}); chunks = [];
     if (!b.size) return;
-    try { await addItem(b, 'video', recThumb); bump(recThumb); }
+    try { await addItem(b, 'video', {thumb: recThumb}); bump(recThumb); }
     catch(e){ toast(t('فشل حفظ الفيديو: المساحة ممتلئة؟')); }
   };
   recorder.start(1000);
@@ -672,24 +1083,35 @@ $('camClose').onclick = closeCam;
 $('shutter').onclick = () => camMode === 'photo' ? snap() : recorder ? stopRec() : startRec();
 $('modePhoto').onclick = () => { if (!recorder && camMode !== 'photo') setMode('photo'); };
 $('modeVideo').onclick = () => { if (camMode !== 'video') setMode('video'); };
+$('camZoom').onclick = () => setZoom(camZoom === 1 ? 2 : camZoom === 2 ? 3 : 1);
+$('camGrid').onclick = () => $('camGrid').classList.toggle('on', $('gridLines').classList.toggle('on'));
+$('camTorch').onclick = async () => {
+  try {
+    await stream.getVideoTracks()[0].applyConstraints({advanced: [{torch: !torch}]});
+    torch = !torch; $('camTorch').classList.toggle('on', torch);
+  } catch(e){}
+};
 $('camFlip').onclick = () => {
   if (recorder) return;
   facing = facing === 'environment' ? 'user' : 'environment';
+  $('camFlip').classList.toggle('spin');
   startStream().catch(() => toast(t('تعذّر تبديل الكاميرا')));
 };
 
-// Phone's own camera: full sensor quality, flash and zoom; result comes straight here, not to the gallery.
-$('btnNative').onclick = () => $('nativeInput').click();
-$('nativeInput').onchange = async e => {
+// Phone's own camera (full sensor quality), and importing existing files: both land here, not in the gallery.
+async function takeFiles(e){
   const files = [...e.target.files];
   e.target.value = '';
   let ok = 0;
   for (const f of files){
-    try { await addItem(f, f.type.startsWith('video') ? 'video' : 'image'); ok++; }
+    try { await addItem(f, f.type.startsWith('video') ? 'video' : 'image', {createdAt: f.lastModified}); ok++; }
     catch(err){ toast(t('فشل الحفظ: المساحة ممتلئة؟')); break; }
   }
   if (ok) toast(t('تم حفظ {n} عنصر', {n: ok}));
-};
+}
+$('btnNative').onclick = () => $('nativeInput').click();
+$('btnImport').onclick = () => $('importInput').click();
+$('nativeInput').onchange = $('importInput').onchange = takeFiles;
 
 /* ---------- settings ---------- */
 function renderChips(){
@@ -705,7 +1127,7 @@ function renderChips(){
 }
 function applyDays(v){
   const cut = Date.now() - v * DAY;
-  const hit = v ? items.filter(i => !i.keep && i.createdAt < cut).length : 0;
+  const hit = v ? items.filter(i => !i.keep && baseOf(i) < cut).length : 0;
   if (hit && !confirm(t('هذه المدة ستحذف {n} عنصر موجود الآن. متابعة؟', {n: hit}))) return renderChips();
   setDays(v);
   renderChips();
@@ -725,36 +1147,40 @@ $('langChips').replaceChildren(...[['ar','العربية'],['en','English']].map
 $('installText').innerHTML = t('للحفاظ على الصور ثبّت التطبيق: اكبس زر <b>المشاركة</b> في Safari ثم <b>إضافة إلى الشاشة الرئيسية</b>.');
 $('btnSettings').onclick = async () => {
   renderChips();
+  const used = items.reduce((s, i) => s + (i.size || 0), 0);
   $('stCount').textContent = items.length;
-  $('stSize').textContent = fmtSize(items.reduce((s, i) => s + (i.size || 0), 0));
+  $('stSize').textContent = fmtSize(used);
+  $('stBar').style.transform = 'scaleX(0)';
+  show($('settings'));
+  const est = await navigator.storage?.estimate?.().catch(() => null);
+  if (est?.quota){
+    $('stSize').textContent = fmtSize(used) + ' / ' + fmtSize(est.quota);
+    $('stBar').style.transform = 'scaleX(' + clamp(Math.max(used, est.usage || 0) / est.quota, used ? .02 : 0, 1) + ')';
+  }
   const p = navigator.storage?.persisted ? await navigator.storage.persisted() : false;
   $('stPersist').textContent = t(p ? 'مفعّلة' : 'غير مفعّلة');
-  $('settings').hidden = false;
 };
-$('settingsClose').onclick = () => $('settings').hidden = true;
-$('settings').onclick = e => { if (e.target === $('settings')) $('settings').hidden = true; };
+$('settingsClose').onclick = () => hide($('settings'));
+$('settings').onclick = e => { if (e.target === $('settings')) hide($('settings')); };
 $('wipe').onclick = async () => {
-  if (!items.length || !confirm(t('حذف كل الصور والفيديوهات ({n}) نهائياً، حتى المستثناة؟', {n: items.length}))) return;
+  if (!items.length || !confirm(t('حذف كل الصور والفيديوهات ({n}) نهائياً، حتى المحفوظة؟', {n: items.length}))) return;
+  pending = null;
   await removeItems(items.map(i => i.id));
-  $('settings').hidden = true;
+  hide($('settings'));
 };
 
 /* ---------- misc ---------- */
-let toastTimer;
-function toast(msg){
-  const t = $('toast'); t.textContent = msg; t.hidden = false;
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 2800);
-}
 const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
 if (!standalone && !localStorage.getItem('installDismissed')) $('installBanner').hidden = false;
 $('installClose').onclick = () => { localStorage.setItem('installDismissed', '1'); $('installBanner').hidden = true; };
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden){
+    commitPending();
     if (recorder) stopRec();
-    if (!$('cam').hidden) stopStream();
+    if (isOpen(cam)) stopStream();
   } else {
-    if (!$('cam').hidden) startStream().catch(closeCam);
+    if (isOpen(cam)) startStream().catch(closeCam);
     if (db) cleanup().then(render);
   }
 });

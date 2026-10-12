@@ -1,4 +1,4 @@
-const CACHE = 'workcam-v4';
+const CACHE = 'workcam-v5';
 const ASSETS = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -14,17 +14,18 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Serve the cached shell immediately (works offline) and refresh it in the background.
+// Network first so updates show up on the next open; the cache answers when offline or the network is slow.
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
-  e.respondWith(
-    caches.match(e.request).then(hit => {
-      const net = fetch(e.request).then(r => {
-        if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
-        return r;
-      }).catch(() => hit);
-      return hit || net;
-    })
-  );
+  e.respondWith((async () => {
+    const hit = await caches.match(e.request);
+    const net = fetch(e.request).then(r => {
+      if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
+      return r;
+    });
+    if (!hit) return net;
+    const slow = new Promise(res => setTimeout(() => res(hit), 2500));
+    return Promise.race([net.catch(() => hit), slow]);
+  })());
 });

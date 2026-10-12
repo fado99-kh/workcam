@@ -354,6 +354,7 @@ main{padding-bottom:calc(var(--sb) + 130px)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v5</p>
   </div>
 </div>
 
@@ -1196,7 +1197,12 @@ document.addEventListener('visibilitychange', () => {
   render();
   await cleanup();
   navigator.storage?.persist?.();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator){
+    // when a new version takes over, reload once so it shows without a second launch
+    const had = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (had && !isOpen(cam) && !viewing) location.reload(); });
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
 })();
 </script>
 </body>

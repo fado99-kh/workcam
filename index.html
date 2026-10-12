@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>عابر</title>
+<title>SnapFade</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0e1014">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="عابر">
+<meta name="apple-mobile-web-app-title" content="SnapFade">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-180.png">
 <style>
@@ -49,7 +49,7 @@ main{padding-bottom:calc(var(--sb) + 120px)}
 .cell img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .cell .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .tag{position:absolute;bottom:4px;left:4px;font-size:11px;padding:1px 6px;border-radius:8px;
-  background:rgba(0,0,0,.6);direction:rtl}
+  background:rgba(0,0,0,.6)}
 .tag.soon{background:var(--danger);color:#fff}
 .tag.keep{background:var(--accent);color:#111}
 .vid{position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;
@@ -150,7 +150,7 @@ main{padding-bottom:calc(var(--sb) + 120px)}
 
 <header>
   <div>
-    <h1>عابر</h1>
+    <h1>SnapFade</h1>
     <div class="sub" id="sub"></div>
   </div>
   <div class="grow"></div>
@@ -161,7 +161,7 @@ main{padding-bottom:calc(var(--sb) + 120px)}
 </header>
 
 <div class="banner" id="installBanner" hidden>
-  <div>للحفاظ على الصور ثبّت التطبيق: اكبس زر <b>المشاركة</b> في Safari ثم <b>إضافة إلى الشاشة الرئيسية</b>.</div>
+  <div id="installText"></div>
   <button id="installClose" aria-label="إغلاق">×</button>
 </div>
 
@@ -241,6 +241,8 @@ main{padding-bottom:calc(var(--sb) + 120px)}
 <div class="scrim" id="settings" hidden>
   <div class="sheet">
     <h2>الإعدادات</h2>
+    <h3>اللغة</h3>
+    <div class="chips" id="langChips"></div>
     <h3>الحذف التلقائي بعد</h3>
     <div class="chips" id="chips"></div>
     <div class="custom">مدة أخرى: <input id="customDays" type="number" inputmode="numeric" min="1" max="3650"> يوم</div>
@@ -260,6 +262,60 @@ main{padding-bottom:calc(var(--sb) + 120px)}
 const DAY = 86400000;
 const $ = id => document.getElementById(id);
 const PRESETS = [[7,'أسبوع'],[14,'أسبوعين'],[30,'شهر'],[60,'شهرين'],[90,'3 أشهر'],[0,'بدون حذف']];
+
+/* ---------- language ---------- */
+const LANG = localStorage.getItem('lang') || ((navigator.language || 'en').toLowerCase().startsWith('ar') ? 'ar' : 'en');
+document.documentElement.lang = LANG;
+document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+const items_en = n => n + (n === 1 ? ' item' : ' items');
+// Arabic text is the key; English is looked up here.
+const EN = {
+  'تحديد':'Select', 'إلغاء':'Cancel', 'الإعدادات':'Settings', 'إغلاق':'Close', 'جودة كاملة':'Full quality',
+  'تصوير':'Capture', 'مشاركة':'Share', 'استثناء من الحذف':'Keep', 'إلغاء الاستثناء':"Don't keep", 'حذف':'Delete',
+  'تم':'Done', 'صورة':'Photo', 'فيديو':'Video', 'التقاط':'Shutter', 'تبديل الكاميرا':'Switch camera', 'رجوع':'Back',
+  'اللغة':'Language', 'الحذف التلقائي بعد':'Auto-delete after', 'مدة أخرى:':'Custom:', 'يوم':'days',
+  'أي صورة أو فيديو أقدم من هذه المدة ينحذف تلقائياً عند فتح التطبيق. العناصر المستثناة لا تنحذف.':
+    'Any photo or video older than this is deleted automatically when you open the app. Kept items are never deleted.',
+  'التخزين':'Storage', 'عدد العناصر':'Items', 'الحجم':'Size', 'حماية التخزين':'Storage protection',
+  'حذف كل شيء الآن':'Delete everything now',
+  'أسبوع':'1 week', 'أسبوعين':'2 weeks', 'شهر':'1 month', 'شهرين':'2 months', '3 أشهر':'3 months', 'بدون حذف':'Never',
+  'اليوم':'Today', 'أمس':'Yesterday', 'محفوظ':'Kept', '{n} يوم':'{n}d',
+  '{n} عنصر': p => items_en(p.n),
+  'الحذف بعد {n} يوم':'Deleted after {n} days', 'بدون حذف تلقائي':'No auto-delete',
+  'ما في صور بعد.<br>صوّر من هنا والصور تبقى داخل التطبيق فقط،<br>بعيدة عن صورك الشخصية.':
+    'No photos yet.<br>Shoot here and everything stays inside the app,<br>away from your personal photos.',
+  'للحفاظ على الصور ثبّت التطبيق: اكبس زر <b>المشاركة</b> في Safari ثم <b>إضافة إلى الشاشة الرئيسية</b>.':
+    'To keep your photos safe, install the app: tap <b>Share</b> in Safari, then <b>Add to Home Screen</b>.',
+  'مشاركة ({n})':'Share ({n})', 'لحظة، جاري التجهيز…':'One moment, preparing…',
+  'حذف {n} عنصر نهائياً؟': p => 'Permanently delete ' + items_en(p.n) + '?',
+  'تعذّرت المشاركة':'Sharing failed', 'الملف غير موجود':'File not found', 'مستثنى من الحذف':'Kept',
+  'ينحذف بعد {n} يوم':'Deleted in {n} days', 'حذف هذا العنصر نهائياً؟':'Permanently delete this item?',
+  'ما قدرت أفتح الكاميرا. تأكد من الإذن أو استخدم "جودة كاملة"':'Could not open the camera. Check the permission or use "Full quality"',
+  'تعذّر تشغيل الكاميرا':'Could not start the camera', 'فشل الالتقاط':'Capture failed',
+  'فشل الحفظ: المساحة ممتلئة؟':'Save failed: storage full?',
+  'تسجيل الفيديو غير مدعوم هنا، استخدم "جودة كاملة"':'Video recording is not supported here, use "Full quality"',
+  'فشل حفظ الفيديو: المساحة ممتلئة؟':'Video save failed: storage full?',
+  'تعذّر تبديل الكاميرا':'Could not switch camera',
+  'تم حفظ {n} عنصر': p => 'Saved ' + items_en(p.n),
+  'هذه المدة ستحذف {n} عنصر موجود الآن. متابعة؟': p => 'This will delete ' + items_en(p.n) + ' right now. Continue?',
+  'مفعّلة':'On', 'غير مفعّلة':'Off',
+  'حذف كل الصور والفيديوهات ({n}) نهائياً، حتى المستثناة؟':'Permanently delete all {n} photos and videos, including kept ones?',
+  'تعذّر فتح التخزين. إذا كنت في التصفح الخاص، افتح التطبيق في نافذة عادية.':
+    'Could not open storage. If you are in Private Browsing, open the app in a normal window.',
+  'تم حذف {n} عنصر قديم تلقائياً': p => items_en(p.n).replace(' item', ' old item') + ' deleted automatically',
+};
+function t(key, p){
+  let v = LANG === 'en' && EN[key] !== undefined ? EN[key] : key;
+  if (typeof v === 'function') return v(p);
+  return p ? v.replace('{n}', p.n) : v;
+}
+if (LANG === 'en'){
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = w.nextNode());){ const k = n.nodeValue.trim(); if (typeof EN[k] === 'string') n.nodeValue = EN[k]; }
+  document.querySelectorAll('[aria-label]').forEach(e => {
+    const k = e.getAttribute('aria-label'); if (typeof EN[k] === 'string') e.setAttribute('aria-label', EN[k]);
+  });
+}
 
 let db, items = [];
 let selecting = false;
@@ -331,7 +387,7 @@ async function cleanup(){
   const old = items.filter(i => !i.keep && i.createdAt < cut).map(i => i.id);
   if (!old.length) return;
   await removeItems(old);
-  toast('تم حذف ' + old.length + ' عنصر قديم تلقائياً');
+  toast(t('تم حذف {n} عنصر قديم تلقائياً', {n: old.length}));
 }
 
 /* ---------- thumbnails ---------- */
@@ -366,9 +422,9 @@ const pad = n => String(n).padStart(2, '0');
 function dayLabel(ts){
   const d = new Date(ts), today = new Date(); today.setHours(0,0,0,0);
   const diff = Math.round((today - new Date(d).setHours(0,0,0,0)) / DAY);
-  if (diff === 0) return 'اليوم';
-  if (diff === 1) return 'أمس';
-  return d.toLocaleDateString('ar-u-nu-latn', {weekday:'long', day:'numeric', month:'long'});
+  if (diff === 0) return t('اليوم');
+  if (diff === 1) return t('أمس');
+  return d.toLocaleDateString(LANG === 'ar' ? 'ar-u-nu-latn' : 'en', {weekday:'long', day:'numeric', month:'long'});
 }
 function daysLeft(m){
   const d = getDays();
@@ -384,13 +440,12 @@ function render(){
   main.textContent = '';
   main.classList.toggle('selecting', selecting);
   const d = getDays();
-  $('sub').textContent = items.length
-    ? items.length + ' عنصر · ' + (d ? 'الحذف بعد ' + d + ' يوم' : 'بدون حذف تلقائي')
-    : (d ? 'الحذف التلقائي بعد ' + d + ' يوم' : 'بدون حذف تلقائي');
+  const rule = d ? t('الحذف بعد {n} يوم', {n: d}) : t('بدون حذف تلقائي');
+  $('sub').textContent = items.length ? t('{n} عنصر', {n: items.length}) + ' · ' + rule : rule;
   $('btnSelect').hidden = !items.length;
 
   if (!items.length){
-    main.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><div>ما في صور بعد.<br>صوّر من هنا والصور تبقى داخل التطبيق فقط،<br>بعيدة عن صورك الشخصية.</div></div>';
+    main.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><div>' + t('ما في صور بعد.<br>صوّر من هنا والصور تبقى داخل التطبيق فقط،<br>بعيدة عن صورك الشخصية.') + '</div></div>';
     return;
   }
   let label, grid;
@@ -405,11 +460,11 @@ function render(){
     c.className = 'cell' + (selected.has(m.id) ? ' sel' : '');
     c.dataset.id = m.id;
     if (m.thumb){ const img = new Image(); img.src = m.thumb; img.alt = ''; c.append(img); }
-    else c.insertAdjacentHTML('beforeend', '<div class="ph">' + (m.type === 'video' ? 'فيديو' : 'صورة') + '</div>');
+    else c.insertAdjacentHTML('beforeend', '<div class="ph">' + t(m.type === 'video' ? 'فيديو' : 'صورة') + '</div>');
     if (m.type === 'video') c.insertAdjacentHTML('beforeend', '<div class="vid">' + PLAY + '</div>');
     const left = daysLeft(m);
-    if (m.keep) c.insertAdjacentHTML('beforeend', '<div class="tag keep">محفوظ</div>');
-    else if (left !== null) c.insertAdjacentHTML('beforeend', '<div class="tag' + (left <= 3 ? ' soon' : '') + '">' + left + ' يوم</div>');
+    if (m.keep) c.insertAdjacentHTML('beforeend', '<div class="tag keep">' + t('محفوظ') + '</div>');
+    else if (left !== null) c.insertAdjacentHTML('beforeend', '<div class="tag' + (left <= 3 ? ' soon' : '') + '">' + t('{n} يوم', {n: left}) + '</div>');
     c.insertAdjacentHTML('beforeend', '<div class="check"></div>');
     grid.append(c);
   }
@@ -436,7 +491,7 @@ function fileFor(m, blob){
 function setSelecting(on){
   selecting = on;
   if (!on) selected.clear();
-  $('btnSelect').textContent = on ? 'إلغاء' : 'تحديد';
+  $('btnSelect').textContent = t(on ? 'إلغاء' : 'تحديد');
   $('btnSelect').classList.toggle('on', on);
   $('selbar').hidden = !on;
   $('dock').hidden = on;
@@ -456,14 +511,14 @@ function toggleSelect(id, cell){
 function updateSelBar(){
   const n = selected.size;
   for (const id of ['selShare','selKeep','selDelete']) $(id).disabled = !n;
-  $('selShare').lastElementChild.textContent = n ? 'مشاركة (' + n + ')' : 'مشاركة';
+  $('selShare').lastElementChild.textContent = n ? t('مشاركة ({n})', {n}) : t('مشاركة');
   const allKept = n && [...selected.keys()].every(id => items.find(i => i.id === id)?.keep);
-  $('selKeep').lastElementChild.textContent = allKept ? 'إلغاء الاستثناء' : 'استثناء من الحذف';
+  $('selKeep').lastElementChild.textContent = t(allKept ? 'إلغاء الاستثناء' : 'استثناء من الحذف');
 }
 $('btnSelect').onclick = () => setSelecting(!selecting);
 $('selShare').onclick = () => {
   const files = [...selected.values()];
-  if (files.some(f => !f)) return toast('لحظة، جاري التجهيز…');
+  if (files.some(f => !f)) return toast(t('لحظة، جاري التجهيز…'));
   share(files);
 };
 $('selKeep').onclick = async () => {
@@ -473,7 +528,7 @@ $('selKeep').onclick = async () => {
   setSelecting(false);
 };
 $('selDelete').onclick = async () => {
-  if (!confirm('حذف ' + selected.size + ' عنصر نهائياً؟')) return;
+  if (!confirm(t('حذف {n} عنصر نهائياً؟', {n: selected.size}))) return;
   await removeItems([...selected.keys()]);
   setSelecting(false);
 };
@@ -482,7 +537,7 @@ $('selDelete').onclick = async () => {
 async function share(files){
   if (navigator.canShare && navigator.canShare({files})){
     try { await navigator.share({files}); }
-    catch(e){ if (e.name !== 'AbortError') toast('تعذّرت المشاركة'); }
+    catch(e){ if (e.name !== 'AbortError') toast(t('تعذّرت المشاركة')); }
     return;
   }
   for (const f of files){
@@ -496,7 +551,7 @@ async function share(files){
 async function openViewer(id){
   const m = items.find(i => i.id === id);
   const blob = await getBlob(id);
-  if (!m || !blob) return toast('الملف غير موجود');
+  if (!m || !blob) return toast(t('الملف غير موجود'));
   const url = URL.createObjectURL(blob);
   viewing = {meta: m, file: fileFor(m, blob), url};
   const el = document.createElement(m.type === 'video' ? 'video' : 'img');
@@ -508,8 +563,8 @@ async function openViewer(id){
 }
 function viewerInfo(){
   const m = viewing.meta, left = daysLeft(m);
-  $('vInfo').textContent = fmtSize(m.size) + ' · ' + (m.keep ? 'مستثنى من الحذف' : left === null ? 'بدون حذف' : 'ينحذف بعد ' + left + ' يوم');
-  $('vKeepLabel').textContent = m.keep ? 'إلغاء الاستثناء' : 'استثناء من الحذف';
+  $('vInfo').textContent = fmtSize(m.size) + ' · ' + (m.keep ? t('مستثنى من الحذف') : left === null ? t('بدون حذف تلقائي') : t('ينحذف بعد {n} يوم', {n: left}));
+  $('vKeepLabel').textContent = t(m.keep ? 'إلغاء الاستثناء' : 'استثناء من الحذف');
 }
 function closeViewer(){
   if (!viewing) return;
@@ -522,7 +577,7 @@ $('vClose').onclick = closeViewer;
 $('vShare').onclick = () => share([viewing.file]);
 $('vKeep').onclick = async () => { await setKeep([viewing.meta.id], !viewing.meta.keep); viewerInfo(); };
 $('vDelete').onclick = async () => {
-  if (!confirm('حذف هذا العنصر نهائياً؟')) return;
+  if (!confirm(t('حذف هذا العنصر نهائياً؟'))) return;
   const id = viewing.meta.id;
   closeViewer();
   await removeItems([id]);
@@ -553,7 +608,7 @@ async function openCam(){
   setMode('photo', true);
   $('cam').hidden = false;
   try { await startStream(); }
-  catch(e){ closeCam(); toast('ما قدرت أفتح الكاميرا. تأكد من الإذن أو استخدم "جودة كاملة"'); }
+  catch(e){ closeCam(); toast(t('ما قدرت أفتح الكاميرا. تأكد من الإذن أو استخدم "جودة كاملة"')); }
 }
 function closeCam(){
   if (recorder) stopRec();
@@ -565,7 +620,7 @@ function setMode(mode, silent){
   $('modePhoto').classList.toggle('on', mode === 'photo');
   $('modeVideo').classList.toggle('on', mode === 'video');
   $('shutter').classList.toggle('video', mode === 'video');
-  if (!silent) startStream().catch(() => toast('تعذّر تشغيل الكاميرا'));
+  if (!silent) startStream().catch(() => toast(t('تعذّر تشغيل الكاميرا')));
 }
 function bump(thumb){
   sessionCount++;
@@ -580,14 +635,14 @@ function snap(){
   const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
   const thumb = square(camVideo, w, h);
   c.toBlob(async b => {
-    if (!b) return toast('فشل الالتقاط');
+    if (!b) return toast(t('فشل الالتقاط'));
     try { await addItem(b, 'image', thumb); bump(thumb); }
-    catch(e){ toast('فشل الحفظ: المساحة ممتلئة؟'); }
+    catch(e){ toast(t('فشل الحفظ: المساحة ممتلئة؟')); }
   }, 'image/jpeg', .93);
 }
 function startRec(){
   const mime = ['video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t));
-  if (!mime) return toast('تسجيل الفيديو غير مدعوم هنا، استخدم "جودة كاملة"');
+  if (!mime) return toast(t('تسجيل الفيديو غير مدعوم هنا، استخدم "جودة كاملة"'));
   chunks = [];
   recThumb = camVideo.videoWidth ? square(camVideo, camVideo.videoWidth, camVideo.videoHeight) : null;
   recorder = new MediaRecorder(stream, {mimeType: mime});
@@ -596,7 +651,7 @@ function startRec(){
     const b = new Blob(chunks, {type: mime.split(';')[0]}); chunks = [];
     if (!b.size) return;
     try { await addItem(b, 'video', recThumb); bump(recThumb); }
-    catch(e){ toast('فشل حفظ الفيديو: المساحة ممتلئة؟'); }
+    catch(e){ toast(t('فشل حفظ الفيديو: المساحة ممتلئة؟')); }
   };
   recorder.start(1000);
   recStart = Date.now();
@@ -620,7 +675,7 @@ $('modeVideo').onclick = () => { if (camMode !== 'video') setMode('video'); };
 $('camFlip').onclick = () => {
   if (recorder) return;
   facing = facing === 'environment' ? 'user' : 'environment';
-  startStream().catch(() => toast('تعذّر تبديل الكاميرا'));
+  startStream().catch(() => toast(t('تعذّر تبديل الكاميرا')));
 };
 
 // Phone's own camera: full sensor quality, flash and zoom; result comes straight here, not to the gallery.
@@ -631,9 +686,9 @@ $('nativeInput').onchange = async e => {
   let ok = 0;
   for (const f of files){
     try { await addItem(f, f.type.startsWith('video') ? 'video' : 'image'); ok++; }
-    catch(err){ toast('فشل الحفظ: المساحة ممتلئة؟'); break; }
+    catch(err){ toast(t('فشل الحفظ: المساحة ممتلئة؟')); break; }
   }
-  if (ok) toast('تم حفظ ' + ok + ' عنصر');
+  if (ok) toast(t('تم حفظ {n} عنصر', {n: ok}));
 };
 
 /* ---------- settings ---------- */
@@ -642,7 +697,7 @@ function renderChips(){
   $('chips').replaceChildren(...PRESETS.map(([v, label]) => {
     const b = document.createElement('button');
     b.className = 'chip' + (v === d ? ' on' : '');
-    b.textContent = label;
+    b.textContent = t(label);
     b.onclick = () => applyDays(v);
     return b;
   }));
@@ -651,7 +706,7 @@ function renderChips(){
 function applyDays(v){
   const cut = Date.now() - v * DAY;
   const hit = v ? items.filter(i => !i.keep && i.createdAt < cut).length : 0;
-  if (hit && !confirm('هذه المدة ستحذف ' + hit + ' عنصر موجود الآن. متابعة؟')) return renderChips();
+  if (hit && !confirm(t('هذه المدة ستحذف {n} عنصر موجود الآن. متابعة؟', {n: hit}))) return renderChips();
   setDays(v);
   renderChips();
   cleanup().then(render);
@@ -660,18 +715,26 @@ $('customDays').onchange = e => {
   const v = Math.floor(+e.target.value);
   if (v >= 1 && v <= 3650) applyDays(v); else renderChips();
 };
+$('langChips').replaceChildren(...[['ar','العربية'],['en','English']].map(([v, label]) => {
+  const b = document.createElement('button');
+  b.className = 'chip' + (v === LANG ? ' on' : '');
+  b.textContent = label;
+  b.onclick = () => { if (v !== LANG){ localStorage.setItem('lang', v); location.reload(); } };
+  return b;
+}));
+$('installText').innerHTML = t('للحفاظ على الصور ثبّت التطبيق: اكبس زر <b>المشاركة</b> في Safari ثم <b>إضافة إلى الشاشة الرئيسية</b>.');
 $('btnSettings').onclick = async () => {
   renderChips();
   $('stCount').textContent = items.length;
   $('stSize').textContent = fmtSize(items.reduce((s, i) => s + (i.size || 0), 0));
   const p = navigator.storage?.persisted ? await navigator.storage.persisted() : false;
-  $('stPersist').textContent = p ? 'مفعّلة' : 'غير مفعّلة';
+  $('stPersist').textContent = t(p ? 'مفعّلة' : 'غير مفعّلة');
   $('settings').hidden = false;
 };
 $('settingsClose').onclick = () => $('settings').hidden = true;
 $('settings').onclick = e => { if (e.target === $('settings')) $('settings').hidden = true; };
 $('wipe').onclick = async () => {
-  if (!items.length || !confirm('حذف كل الصور والفيديوهات (' + items.length + ') نهائياً، حتى المستثناة؟')) return;
+  if (!items.length || !confirm(t('حذف كل الصور والفيديوهات ({n}) نهائياً، حتى المستثناة؟', {n: items.length}))) return;
   await removeItems(items.map(i => i.id));
   $('settings').hidden = true;
 };
@@ -701,7 +764,7 @@ document.addEventListener('visibilitychange', () => {
     db = await openDB();
     items = await loadItems();
   } catch(e){
-    $('main').innerHTML = '<div class="empty">تعذّر فتح التخزين. إذا كنت في التصفح الخاص، افتح التطبيق في نافذة عادية.</div>';
+    $('main').innerHTML = '<div class="empty">' + t('تعذّر فتح التخزين. إذا كنت في التصفح الخاص، افتح التطبيق في نافذة عادية.') + '</div>';
     return;
   }
   render();

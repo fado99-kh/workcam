@@ -1,8 +1,8 @@
 {
-  "name": "عابر",
-  "short_name": "عابر",
-  "lang": "ar",
-  "dir": "rtl",
+  "name": "SnapFade",
+  "short_name": "SnapFade",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

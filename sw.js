@@ -1,4 +1,4 @@
-const CACHE = 'workcam-v5';
+const CACHE = 'workcam-v6';
 const ASSETS = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {

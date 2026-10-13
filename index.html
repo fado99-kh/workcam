@@ -287,7 +287,7 @@ main{padding-bottom:calc(var(--sb) + 130px)}
 <div class="dock" id="dock">
   <button class="side" id="btnImport"><svg class="ic"><use href="#i-import"/></svg>استيراد</button>
   <button class="fab" id="btnCam" aria-label="تصوير"><svg class="ic"><use href="#i-cam"/></svg></button>
-  <button class="side" id="btnNative"><svg class="ic"><use href="#i-star"/></svg>جودة كاملة</button>
+  <button class="side" id="btnNative"><svg class="ic"><use id="sideIcon" href="#i-star"/></svg><span id="sideLabel"></span></button>
 </div>
 <input type="file" id="nativeInput" accept="image/*,video/*" capture="environment" multiple hidden>
 <input type="file" id="importInput" accept="image/*,video/*" multiple hidden>
@@ -351,6 +351,9 @@ main{padding-bottom:calc(var(--sb) + 130px)}
     <h2>الإعدادات</h2>
     <h3>اللغة</h3>
     <div class="chips" id="langChips"></div>
+    <h3>زر التصوير الرئيسي</h3>
+    <div class="chips" id="camChips"></div>
+    <p style="margin-top:10px">كاميرا الآيفون لا تطلب إذن أبداً وبأعلى دقة، لكنها تلتقط صورة واحدة كل مرة. الكاميرا السريعة تلتقط عدة صور متتالية، لكن iOS يطلب إذن الكاميرا عند كل فتحة للتطبيق.</p>
     <h3>الحذف التلقائي بعد</h3>
     <div class="chips" id="chips"></div>
     <div class="custom">مدة أخرى: <input id="customDays" type="number" inputmode="numeric" min="1" max="3650"> يوم</div>
@@ -362,7 +365,7 @@ main{padding-bottom:calc(var(--sb) + 130px)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
-    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v7</p>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v8</p>
   </div>
 </div>
 
@@ -399,6 +402,10 @@ const EN = {
   'استيراد':'Import', 'تصوير':'Capture', 'مشاركة':'Share', 'ألبوم':'Album', 'حفظ':'Keep', 'إلغاء الحفظ':'Unkeep',
   'تجديد':'Renew', 'حذف':'Delete', 'تم':'Done', 'صورة':'Photo', 'فيديو':'Video', 'التقاط':'Shutter',
   'تبديل الكاميرا':'Switch camera', 'فلاش':'Torch', 'شبكة':'Grid', 'رجوع':'Back', 'إضافة':'Add',
+  'زر التصوير الرئيسي':'Main capture button', 'الكاميرا السريعة':'Fast camera', 'كاميرا الآيفون':'iPhone camera',
+  'كاميرا سريعة':'Fast camera',
+  'كاميرا الآيفون لا تطلب إذن أبداً وبأعلى دقة، لكنها تلتقط صورة واحدة كل مرة. الكاميرا السريعة تلتقط عدة صور متتالية، لكن iOS يطلب إذن الكاميرا عند كل فتحة للتطبيق.':
+    'The iPhone camera never asks for permission and gives the highest quality, but takes one photo at a time. The fast camera shoots many photos in a row, but iOS asks for camera permission each time the app is opened.',
   'اللغة':'Language', 'الحذف التلقائي بعد':'Auto-delete after', 'مدة أخرى:':'Custom:', 'يوم':'days',
   'أي صورة أو فيديو أقدم من هذه المدة ينحذف تلقائياً عند فتح التطبيق. العناصر المحفوظة لا تنحذف، وزر "تجديد" يعيد العدّاد من جديد.':
     'Any photo or video older than this is deleted automatically when you open the app. Kept items are never deleted, and "Renew" restarts the countdown.',
@@ -1117,7 +1124,21 @@ function stopRec(){
   recorder = null;
   $('shutter').classList.remove('recording'); $('rec').hidden = true;
 }
-$('btnCam').onclick = openCam;
+// The main button opens the preferred camera; the side button opens the other one.
+const nativeFirst = () => localStorage.getItem('cam') === 'native';
+function applyCamPref(){
+  $('sideLabel').textContent = t(nativeFirst() ? 'كاميرا سريعة' : 'جودة كاملة');
+  $('sideIcon').setAttribute('href', nativeFirst() ? '#i-cam' : '#i-star');
+  $('camChips').replaceChildren(...[['fast','الكاميرا السريعة'],['native','كاميرا الآيفون']].map(([v, label]) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + ((v === 'native') === nativeFirst() ? ' on' : '');
+    b.textContent = t(label);
+    b.onclick = () => { localStorage.setItem('cam', v); applyCamPref(); };
+    return b;
+  }));
+}
+applyCamPref();
+$('btnCam').onclick = () => nativeFirst() ? $('nativeInput').click() : openCam();
 $('camClose').onclick = closeCam;
 $('shutter').onclick = () => camMode === 'photo' ? snap() : recorder ? stopRec() : startRec();
 $('modePhoto').onclick = () => { if (!recorder && camMode !== 'photo') setMode('photo'); };
@@ -1150,7 +1171,7 @@ async function takeFiles(e){
   }
   if (ok) toast(t('تم حفظ {n} عنصر', {n: ok}));
 }
-$('btnNative').onclick = () => $('nativeInput').click();
+$('btnNative').onclick = () => nativeFirst() ? openCam() : $('nativeInput').click();
 $('btnImport').onclick = () => $('importInput').click();
 $('nativeInput').onchange = $('importInput').onchange = takeFiles;
 

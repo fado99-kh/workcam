@@ -91,8 +91,6 @@ main{padding-bottom:calc(var(--sb) + 130px)}
   transition:opacity var(--t-fast),transform var(--t-mid) var(--spring),background-color var(--t-fast)}
 .selecting .check{opacity:1;transform:none}
 .cell.sel .check{background:var(--accent);border-color:var(--accent);transform:scale(1.08)}
-.cell.sel .check::after{content:"";position:absolute;inset:4px 3px 6px;border:solid #111;
-  border-width:0 0 2.5px 2.5px;transform:rotate(-45deg)}
 .cell.sel img{transform:scale(.84);border-radius:10px}
 
 .empty{text-align:center;color:var(--muted);padding:80px 30px;line-height:1.9;font-size:15px;animation:cellIn .5s var(--ease) both}
@@ -241,6 +239,43 @@ main{padding-bottom:calc(var(--sb) + 130px)}
 #toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;transition:opacity var(--t-mid),transform .34s var(--spring)}
 #toast button{color:#b86a00;font-weight:700;padding:4px 2px}
 
+
+/* selection order numbers */
+.cell .check{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#111}
+
+/* album notes */
+.note{margin:12px 12px 4px;padding:12px 14px;border-radius:14px;background:var(--panel);border:1px solid var(--line);
+  animation:cellIn .35s var(--ease) both}
+.note h4{margin:0 0 6px;font-size:12px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px}
+.note .ntext{white-space:pre-wrap;font-size:14px;line-height:1.6;-webkit-user-select:text;user-select:text;max-height:9.6em;overflow:auto}
+.note .nact{display:flex;gap:8px;margin-top:10px}
+.note .nact button{height:32px;padding:0 14px;border-radius:16px;background:var(--panel2);font-size:13px}
+.note .nact button.primary{background:var(--accent);color:#111;font-weight:600}
+.note.blank{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;width:calc(100% - 24px);text-align:start}
+.note.blank .ic{color:var(--accent)}
+textarea.notes{width:100%;min-height:180px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);
+  font:inherit;font-size:15px;line-height:1.6;padding:10px 12px;outline:none;resize:vertical;margin-top:10px}
+textarea.notes:focus{border-color:var(--accent)}
+
+/* share order */
+#orderList{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.orow{display:flex;align-items:center;gap:12px;padding:6px 8px;border-radius:12px;background:var(--panel2);
+  transition:transform var(--t-mid) var(--ease),box-shadow var(--t-mid)}
+.orow.lift{transition:box-shadow var(--t-mid);box-shadow:0 10px 26px rgba(0,0,0,.5);z-index:2;position:relative;background:#2c3140}
+.orow img{width:52px;height:52px;border-radius:9px;object-fit:cover;flex:none;pointer-events:none}
+.onum{min-width:46px;font-size:13px;font-weight:700;color:var(--muted);text-align:center}
+.orow:first-child .onum{color:var(--accent)}
+.oinfo{flex:1;font-size:12px;color:var(--muted);min-width:0}
+.handle{width:44px;height:44px;display:flex;align-items:center;justify-content:center;touch-action:none;color:var(--muted);font-size:22px;cursor:grab}
+
+/* lock */
+#lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:30px}
+#lock img{width:92px;height:92px;border-radius:24px}
+#lock h2{margin:0;font-size:22px}
+#lock p{margin:0;color:var(--muted);font-size:14px}
+#lock .wide{max-width:260px}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -260,6 +295,10 @@ main{padding-bottom:calc(var(--sb) + 130px)}
   <symbol id="i-renew" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5"/><path d="M12 8v4.5l3 1.5"/></symbol>
   <symbol id="i-flip" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"/></symbol>
   <symbol id="i-grid" viewBox="0 0 24 24"><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-paste" viewBox="0 0 24 24"><path d="M9 4h6v3H9zM8 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
 </svg>
@@ -285,7 +324,7 @@ main{padding-bottom:calc(var(--sb) + 130px)}
 <main id="main"></main>
 
 <div class="dock" id="dock">
-  <button class="side" id="btnImport"><svg class="ic"><use href="#i-import"/></svg>استيراد</button>
+  <button class="side" id="btnImport"><svg class="ic"><use href="#i-plus"/></svg>إضافة</button>
   <button class="fab" id="btnCam" aria-label="تصوير"><svg class="ic"><use href="#i-cam"/></svg></button>
   <button class="side" id="btnNative"><svg class="ic"><use id="sideIcon" href="#i-star"/></svg><span id="sideLabel"></span></button>
 </div>
@@ -351,6 +390,9 @@ main{padding-bottom:calc(var(--sb) + 130px)}
     <h2>الإعدادات</h2>
     <h3>اللغة</h3>
     <div class="chips" id="langChips"></div>
+    <h3>قفل Face ID</h3>
+    <div class="chips" id="lockChips"></div>
+    <p style="margin-top:10px">يطلب Face ID عند فتح التطبيق وبعد دقيقة من الخروج منه.</p>
     <h3>زر التصوير الرئيسي</h3>
     <div class="chips" id="camChips"></div>
     <p style="margin-top:10px">كاميرا الآيفون لا تطلب إذن أبداً وبأعلى دقة، لكنها تلتقط صورة واحدة كل مرة. الكاميرا السريعة تلتقط عدة صور متتالية، لكن iOS يطلب إذن الكاميرا عند كل فتحة للتطبيق.</p>
@@ -365,7 +407,7 @@ main{padding-bottom:calc(var(--sb) + 130px)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
-    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v8</p>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v9</p>
   </div>
 </div>
 
@@ -379,6 +421,43 @@ main{padding-bottom:calc(var(--sb) + 130px)}
       <button class="hbtn on" id="albumAdd">إضافة</button>
     </div>
   </div>
+</div>
+
+<div class="scrim" id="addSheet" hidden>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2>إضافة</h2>
+    <div class="alist">
+      <button class="arow" id="addImport"><svg class="ic"><use href="#i-import"/></svg><span>استيراد صور وفيديو<br><small style="color:var(--muted)">من الصور أو الملفات</small></span></button>
+      <button class="arow" id="addPaste"><svg class="ic"><use href="#i-paste"/></svg><span>لصق من الحافظة<br><small style="color:var(--muted)">لقطة شاشة أو صورة نسختها</small></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="noteSheet" hidden>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="noteTitle"></h2>
+    <textarea class="notes" id="noteText" placeholder="السعر، الممشى، الموديل، نص الإعلان…"></textarea>
+    <button class="wide primary" id="noteSave">حفظ الملاحظات</button>
+  </div>
+</div>
+
+<div class="scrim" id="orderSheet" hidden>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2>ترتيب الصور</h2>
+    <p>اسحب ≡ لترتيب الصور. الأولى هي صورة الغلاف بالإعلان.</p>
+    <div id="orderList"></div>
+    <button class="wide primary" id="orderShare">مشاركة</button>
+  </div>
+</div>
+
+<div id="lock" hidden>
+  <img src="icon-180.png" alt="">
+  <h2>SnapFade</h2>
+  <p>التطبيق مقفل</p>
+  <button class="wide primary" id="unlockBtn">فتح بـ Face ID</button>
 </div>
 
 <div id="toast"><span></span><button hidden></button></div>
@@ -413,6 +492,17 @@ const EN = {
   'حذف كل شيء الآن':'Delete everything now',
   'أسبوع':'1 week', 'أسبوعين':'2 weeks', 'شهر':'1 month', 'شهرين':'2 months', '3 أشهر':'3 months', 'بدون حذف':'Never',
   'اليوم':'Today', 'أمس':'Yesterday', 'محفوظ':'Kept', '{n} يوم':'{n}d',
+  'لصق من الحافظة':'Paste from clipboard', 'استيراد صور وفيديو':'Import photos & videos',
+  'من الصور أو الملفات':'From Photos or Files', 'لقطة شاشة أو صورة نسختها':'A screenshot or image you copied',
+  'ما في صورة بالحافظة':'No image on the clipboard',
+  'ترتيب الصور':'Arrange photos', 'غلاف':'Cover',
+  'اسحب ≡ لترتيب الصور. الأولى هي صورة الغلاف بالإعلان.':'Drag ≡ to reorder. The first one is the cover photo of your listing.',
+  'ملاحظات الإعلان':'Listing notes', 'نسخ':'Copy', 'تعديل':'Edit', 'تم النسخ':'Copied',
+  'أضف السعر والممشى ونص الإعلان':'Add price, mileage and listing text', 'حفظ الملاحظات':'Save notes',
+  'السعر، الممشى، الموديل، نص الإعلان…':'Price, mileage, model, listing text…',
+  'قفل Face ID':'Face ID lock', 'تشغيل':'On', 'إيقاف':'Off', 'التطبيق مقفل':'App locked', 'فتح بـ Face ID':'Unlock with Face ID',
+  'تعذّر تفعيل القفل':'Could not turn on the lock',
+  'يطلب Face ID عند فتح التطبيق وبعد دقيقة من الخروج منه.':'Asks for Face ID when the app opens and after a minute away.',
   'الكل':'All', 'قريب الحذف':'Expiring', 'تحديد الكل':'Select all', 'تراجع':'Undo',
   '{n} عنصر': p => items_en(p.n),
   'الحذف بعد {n} يوم':'Deleted after {n} days', 'بدون حذف تلقائي':'No auto-delete',
@@ -706,7 +796,9 @@ function render(){
       : inAlbum ? t('هذا الألبوم فارغ.<br>أي شيء تصوّره الآن ينحفظ فيه.') : t('لا يوجد شيء هنا.');
     main.innerHTML = '<div class="empty"><img src="icon-180.png" alt=""><div>' + msg + '</div>'
       + (inAlbum ? '<button class="wide danger" id="albumDel">' + t('حذف الألبوم') + '</button>' : '') + '</div>';
+    if (inAlbum) main.prepend(noteCard(filter.slice(2)));
     if (inAlbum) $('albumDel').onclick = () => {
+      const notes = getNotes(); delete notes[filter.slice(2)]; localStorage.setItem('notes', JSON.stringify(notes));
       localStorage.setItem('albums', JSON.stringify(savedAlbums().filter(a => a !== filter.slice(2))));
       filter = 'all'; render();
     };
@@ -714,6 +806,7 @@ function render(){
     return;
   }
   const frag = document.createDocumentFragment();
+  if (filter.startsWith('a:')) frag.append(noteCard(filter.slice(2)));
   let label, grid, n = 0;
   for (const m of list){
     const l = dayLabel(m.createdAt);
@@ -795,9 +888,16 @@ function updateSelBar(){
   for (const id of ['selShare','selAlbum','selKeep','selRenew','selDelete']) $(id).disabled = !n;
   $('selShare').lastElementChild.textContent = n ? t('مشاركة ({n})', {n}) : t('مشاركة');
   $('selKeep').lastElementChild.textContent = t(allKept() ? 'إلغاء الحفظ' : 'حفظ');
+  // the number on each selected photo is its position when shared
+  const pos = [...selected.keys()];
+  for (const c of document.querySelectorAll('.cell')){
+    const i = pos.indexOf(+c.dataset.id);
+    c.querySelector('.check').textContent = i < 0 ? '' : i + 1;
+  }
 }
 $('btnSelect').onclick = () => setSelecting(!selecting);
 $('selShare').onclick = () => {
+  if (selected.size > 1){ order = [...selected.keys()]; renderOrder(); return show($('orderSheet')); }
   const files = [...selected.values()];
   if (files.some(f => !f)) return toast(t('لحظة، جاري التجهيز…'));
   share(files);
@@ -1172,7 +1272,6 @@ async function takeFiles(e){
   if (ok) toast(t('تم حفظ {n} عنصر', {n: ok}));
 }
 $('btnNative').onclick = () => nativeFirst() ? openCam() : $('nativeInput').click();
-$('btnImport').onclick = () => $('importInput').click();
 $('nativeInput').onchange = $('importInput').onchange = takeFiles;
 
 /* ---------- settings ---------- */
@@ -1236,12 +1335,183 @@ const standalone = navigator.standalone || matchMedia('(display-mode: standalone
 if (!standalone && !localStorage.getItem('installDismissed')) $('installBanner').hidden = false;
 $('installClose').onclick = () => { localStorage.setItem('installDismissed', '1'); $('installBanner').hidden = true; };
 
+
+/* ---------- add: import or paste ---------- */
+$('btnImport').onclick = () => show($('addSheet'));
+$('addSheet').onclick = e => { if (e.target === $('addSheet')) hide($('addSheet')); };
+$('addImport').onclick = () => { hide($('addSheet')); $('importInput').click(); };
+// Screenshots: iOS "Copy and Delete" puts the image on the clipboard without saving it to Photos.
+$('addPaste').onclick = async () => {
+  hide($('addSheet'));
+  let n = 0;
+  try {
+    for (const it of await navigator.clipboard.read()){
+      const type = it.types.find(x => x.startsWith('image/'));
+      if (!type) continue;
+      await addItem(await it.getType(type), 'image'); n++;
+    }
+  } catch(e){}
+  toast(n ? t('تم حفظ {n} عنصر', {n}) : t('ما في صورة بالحافظة'));
+};
+document.addEventListener('paste', async e => {
+  const files = [...(e.clipboardData?.files || [])].filter(f => /^(image|video)\//.test(f.type));
+  if (!files.length || e.target.closest?.('input,textarea')) return;
+  e.preventDefault();
+  for (const f of files) await addItem(f, f.type.startsWith('video') ? 'video' : 'image');
+  toast(t('تم حفظ {n} عنصر', {n: files.length}));
+});
+
+/* ---------- album notes ---------- */
+const getNotes = () => JSON.parse(localStorage.getItem('notes') || '{}');
+function noteCard(album){
+  const text = getNotes()[album] || '';
+  const el = document.createElement(text ? 'div' : 'button');
+  if (!text){
+    el.className = 'note blank';
+    el.innerHTML = '<svg class="ic"><use href="#i-note"/></svg>';
+    el.append(t('أضف السعر والممشى ونص الإعلان'));
+    el.onclick = () => openNotes(album);
+    return el;
+  }
+  el.className = 'note';
+  el.innerHTML = '<h4><svg class="ic" style="width:15px;height:15px"><use href="#i-note"/></svg></h4><div class="ntext"></div><div class="nact"><button class="primary"></button><button></button></div>';
+  el.querySelector('h4').append(t('ملاحظات الإعلان'));
+  el.querySelector('.ntext').textContent = text;
+  const [copy, edit] = el.querySelectorAll('.nact button');
+  copy.textContent = t('نسخ'); edit.textContent = t('تعديل');
+  copy.onclick = async () => {
+    try { await navigator.clipboard.writeText(text); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
+  };
+  edit.onclick = () => openNotes(album);
+  return el;
+}
+let noteAlbum = '';
+function openNotes(album){
+  noteAlbum = album;
+  $('noteTitle').textContent = album;
+  $('noteText').value = getNotes()[album] || '';
+  show($('noteSheet'));
+}
+$('noteSave').onclick = () => {
+  const all = getNotes(), v = $('noteText').value.trim();
+  if (v) all[noteAlbum] = v; else delete all[noteAlbum];
+  localStorage.setItem('notes', JSON.stringify(all));
+  $('noteText').blur(); hide($('noteSheet')); render();
+};
+$('noteSheet').onclick = e => { if (e.target === $('noteSheet')) hide($('noteSheet')); };
+
+/* ---------- share order (drag to reorder, first = cover) ---------- */
+let order = [];
+function renderOrder(){
+  $('orderList').replaceChildren(...order.map((id, i) => {
+    const m = items.find(x => x.id === id);
+    const row = document.createElement('div');
+    row.className = 'orow'; row.dataset.id = id;
+    row.innerHTML = '<div class="onum"></div><img alt=""><div class="oinfo"></div><div class="handle">≡</div>';
+    row.querySelector('.onum').textContent = i ? i + 1 : t('غلاف');
+    if (m?.thumb) row.querySelector('img').src = m.thumb;
+    row.querySelector('.oinfo').textContent = m ? new Date(m.createdAt).toLocaleString(LOCALE, {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}) + (m.type === 'video' ? ' · ' + t('فيديو') : '') : '';
+    return row;
+  }));
+}
+$('orderList').addEventListener('pointerdown', e => {
+  const handle = e.target.closest('.handle');
+  if (!handle) return;
+  e.preventDefault();
+  const rows = [...$('orderList').children], row = handle.parentElement, from = rows.indexOf(row);
+  const h = rows.length > 1 ? rows[1].offsetTop - rows[0].offsetTop : row.offsetHeight;
+  const y0 = e.clientY;
+  let to = from;
+  row.classList.add('lift');
+  handle.setPointerCapture(e.pointerId);
+  handle.onpointermove = ev => {
+    const dy = ev.clientY - y0;
+    row.style.transform = 'translateY(' + dy + 'px) scale(1.02)';
+    to = clamp(from + Math.round(dy / h), 0, rows.length - 1);
+    rows.forEach((r, j) => {
+      if (r === row) return;
+      const s = from < to && j > from && j <= to ? -h : from > to && j < from && j >= to ? h : 0;
+      r.style.transform = s ? 'translateY(' + s + 'px)' : '';
+    });
+  };
+  handle.onpointerup = handle.onpointercancel = () => {
+    handle.onpointermove = handle.onpointerup = handle.onpointercancel = null;
+    const [id] = order.splice(from, 1);
+    order.splice(to, 0, id);
+    // keep the grid's selection numbers in the same order
+    const files = new Map(order.map(k => [k, selected.get(k)]));
+    selected.clear(); files.forEach((v, k) => selected.set(k, v));
+    renderOrder(); updateSelBar();
+  };
+});
+$('orderShare').onclick = () => {
+  const files = order.map(id => selected.get(id));
+  if (files.some(f => !f)) return toast(t('لحظة، جاري التجهيز…'));
+  share(files);
+};
+$('orderSheet').onclick = e => { if (e.target === $('orderSheet')) hide($('orderSheet')); };
+
+/* ---------- Face ID lock (passkey on this device) ---------- */
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const rand = n => crypto.getRandomValues(new Uint8Array(n));
+const lockId = () => localStorage.getItem('lockId');
+let hiddenAt = 0, unlocking = false;
+async function unlock(){
+  if (unlocking) return;
+  unlocking = true;
+  try {
+    await navigator.credentials.get({publicKey: {challenge: rand(32), timeout: 60000, userVerification: 'required',
+      allowCredentials: [{type: 'public-key', id: unb64(lockId())}]}});
+    hide($('lock'), 200);
+  } catch(e){}
+  unlocking = false;
+}
+function lockNow(){ if (lockId()){ clearTimeout($('lock')._h); $('lock').hidden = false; $('lock').classList.add('open'); } }
+$('unlockBtn').onclick = unlock;
+function renderLockChips(){
+  $('lockChips').replaceChildren(...[[true,'تشغيل'],[false,'إيقاف']].map(([v, label]) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (!!lockId() === v ? ' on' : '');
+    b.textContent = t(label);
+    b.onclick = () => setLock(v);
+    return b;
+  }));
+}
+async function setLock(on){
+  if (on === !!lockId()) return;
+  try {
+    if (on){
+      const c = await navigator.credentials.create({publicKey: {
+        challenge: rand(32), rp: {name: 'SnapFade'},
+        user: {id: rand(16), name: 'SnapFade', displayName: 'SnapFade'},
+        pubKeyCredParams: [{type: 'public-key', alg: -7}, {type: 'public-key', alg: -257}],
+        authenticatorSelection: {authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred'},
+        timeout: 60000}});
+      localStorage.setItem('lockId', b64(c.rawId));
+    } else {
+      // turning it off needs Face ID too
+      await navigator.credentials.get({publicKey: {challenge: rand(32), userVerification: 'required',
+        allowCredentials: [{type: 'public-key', id: unb64(lockId())}]}});
+      localStorage.removeItem('lockId');
+    }
+  } catch(e){ if (on) toast(t('تعذّر تفعيل القفل')); }
+  renderLockChips();
+}
+renderLockChips();
+lockNow();
+
 document.addEventListener('visibilitychange', () => {
   if (document.hidden){
+    hiddenAt = Date.now();
+    lockNow();
     commitPending();
     if (recorder) stopRec();
     stopStream();
   } else {
+    // a quick trip away (sharing, the iPhone camera) does not need Face ID again
+    if (lockId() && Date.now() - hiddenAt < 60000) hide($('lock'), 200);
+    else if (lockId()) unlock();
     if (isOpen(cam)) startStream().catch(closeCam);
     if (db) cleanup().then(render);
   }
@@ -1256,6 +1526,7 @@ document.addEventListener('visibilitychange', () => {
     return;
   }
   render();
+  if (lockId()) unlock();
   await cleanup();
   navigator.storage?.persist?.();
   if ('serviceWorker' in navigator){

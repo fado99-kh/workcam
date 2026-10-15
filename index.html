@@ -276,6 +276,16 @@ textarea.notes:focus{border-color:var(--accent)}
 #lock p{margin:0;color:var(--muted);font-size:14px}
 #lock .wide{max-width:260px}
 
+
+/* facebook guide */
+.guide h3{color:var(--accent)}
+.guide ol{margin:0;padding-inline-start:22px;font-size:14px;line-height:1.75}
+.guide li{margin-bottom:6px}
+.guide b{color:var(--text)}
+.guide code{background:var(--panel2);padding:1px 6px;border-radius:6px;font-family:inherit;color:var(--accent)}
+.hint{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6}
+.hint b{color:var(--accent)}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -390,6 +400,8 @@ textarea.notes:focus{border-color:var(--accent)}
     <h2>الإعدادات</h2>
     <h3>اللغة</h3>
     <div class="chips" id="langChips"></div>
+    <h3>Facebook Marketplace</h3>
+    <button class="wide" id="fbGuideBtn">طريقة الربط مع فيسبوك</button>
     <h3>قفل Face ID</h3>
     <div class="chips" id="lockChips"></div>
     <p style="margin-top:10px">يطلب Face ID عند فتح التطبيق وبعد دقيقة من الخروج منه.</p>
@@ -407,7 +419,7 @@ textarea.notes:focus{border-color:var(--accent)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
-    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v9</p>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v10</p>
   </div>
 </div>
 
@@ -450,6 +462,16 @@ textarea.notes:focus{border-color:var(--accent)}
     <p>اسحب ≡ لترتيب الصور. الأولى هي صورة الغلاف بالإعلان.</p>
     <div id="orderList"></div>
     <button class="wide primary" id="orderShare">مشاركة</button>
+    <div class="hint" id="orderHint"></div>
+  </div>
+</div>
+
+<div class="scrim" id="fbSheet" hidden>
+  <div class="sheet guide">
+    <div class="grab"></div>
+    <h2>Facebook Marketplace</h2>
+    <div id="fbGuide"></div>
+    <button class="wide primary" id="fbClose">تم</button>
   </div>
 </div>
 
@@ -503,6 +525,8 @@ const EN = {
   'قفل Face ID':'Face ID lock', 'تشغيل':'On', 'إيقاف':'Off', 'التطبيق مقفل':'App locked', 'فتح بـ Face ID':'Unlock with Face ID',
   'تعذّر تفعيل القفل':'Could not turn on the lock',
   'يطلب Face ID عند فتح التطبيق وبعد دقيقة من الخروج منه.':'Asks for Face ID when the app opens and after a minute away.',
+  'طريقة الربط مع فيسبوك':'How to connect to Facebook',
+  'للماركت بليس: اختار <b>SnapFade</b> من قائمة المشاركة، وبفيسبوك افتح ألبوم SnapFade.':'For Marketplace: pick <b>SnapFade</b> in the share sheet, then open the SnapFade album in Facebook.',
   'الكل':'All', 'قريب الحذف':'Expiring', 'تحديد الكل':'Select all', 'تراجع':'Undo',
   '{n} عنصر': p => items_en(p.n),
   'الحذف بعد {n} يوم':'Deleted after {n} days', 'بدون حذف تلقائي':'No auto-delete',
@@ -1450,6 +1474,61 @@ $('orderShare').onclick = () => {
   share(files);
 };
 $('orderSheet').onclick = e => { if (e.target === $('orderSheet')) hide($('orderSheet')); };
+
+/* ---------- facebook guide ---------- */
+const GUIDE = {ar: `<p>فيسبوك بيعرض بس ألبومات تطبيق الصور. هالإعداد بيخلي ألبوم اسمه <code>SnapFade</code> يطلع بقائمة فيسبوك، وبيفضّيه لحاله كل ليلة.</p>
+<h3>1. الألبوم (مرة وحدة)</h3>
+<ol><li>افتح <b>Photos</b> ← <b>Albums</b> ← <b>+</b> ← <b>New Album</b>، وسمّيه <code>SnapFade</code>.</li></ol>
+<h3>2. الاختصار (مرة وحدة)</h3>
+<ol>
+<li>افتح <b>Shortcuts</b> واكبس <b>+</b> فوق.</li>
+<li>اكبس اسم الاختصار فوق ← <b>Rename</b> ← اكتب <code>SnapFade</code>.</li>
+<li>اكبس <b>ⓘ</b> تحت وفعّل <b>Show in Share Sheet</b> ← <b>Done</b>.</li>
+<li>بخانة البحث تحت اكتب <b>Save to Photo Album</b> واكبسها.</li>
+<li>اكبس كلمة <b>Recents</b> واختار ألبوم <code>SnapFade</code> ← <b>Done</b>.</li>
+</ol>
+<h3>3. التفضية الليلية (مرة وحدة)</h3>
+<ol>
+<li>بـ Shortcuts افتح <b>Automation</b> ← <b>+</b> ← <b>Time of Day</b>.</li>
+<li>اختار <b>3:00 AM</b> و <b>Daily</b> و <b>Run Immediately</b> ← <b>Next</b> ← <b>New Blank Automation</b>.</li>
+<li>ضيف <b>Find Photos</b> ← <b>Add Filter</b> ← خليها <b>Album is SnapFade</b>.</li>
+<li>ضيف <b>Delete Photos</b> ← <b>Done</b>.</li>
+<li>بالـ <b>Settings</b> ← <b>Apps</b> ← <b>Shortcuts</b> ← <b>Advanced</b> فعّل <b>Allow Deleting Without Confirmation</b>.</li>
+</ol>
+<h3>الاستعمال كل مرة</h3>
+<ol>
+<li>بـ SnapFade اكبس <b>تحديد</b>، اختار صور السيارة بالترتيب، ثم <b>مشاركة</b>.</li>
+<li>بقائمة المشاركة اختار <b>SnapFade</b> (أول مرة ممكن تلاقيه تحت بـ <b>Edit Actions</b>، فيك تثبته فوق).</li>
+<li>بفيسبوك Marketplace اكبس <b>Add photos</b> ← <b>Camera roll ▾</b> فوق ← <b>SnapFade</b>.</li>
+</ol>`, en: `<p>Facebook only shows albums from the Photos app. This setup adds a <code>SnapFade</code> album to Facebook's list and empties it automatically every night.</p>
+<h3>1. The album (once)</h3>
+<ol><li>Open <b>Photos</b> → <b>Albums</b> → <b>+</b> → <b>New Album</b>, name it <code>SnapFade</code>.</li></ol>
+<h3>2. The shortcut (once)</h3>
+<ol>
+<li>Open <b>Shortcuts</b> and tap <b>+</b>.</li>
+<li>Tap the name at the top → <b>Rename</b> → <code>SnapFade</code>.</li>
+<li>Tap <b>ⓘ</b> at the bottom, turn on <b>Show in Share Sheet</b> → <b>Done</b>.</li>
+<li>Search the actions for <b>Save to Photo Album</b> and tap it.</li>
+<li>Tap <b>Recents</b> and pick the <code>SnapFade</code> album → <b>Done</b>.</li>
+</ol>
+<h3>3. Nightly cleanup (once)</h3>
+<ol>
+<li>In Shortcuts open <b>Automation</b> → <b>+</b> → <b>Time of Day</b>.</li>
+<li>Pick <b>3:00 AM</b>, <b>Daily</b>, <b>Run Immediately</b> → <b>Next</b> → <b>New Blank Automation</b>.</li>
+<li>Add <b>Find Photos</b> → <b>Add Filter</b> → <b>Album is SnapFade</b>.</li>
+<li>Add <b>Delete Photos</b> → <b>Done</b>.</li>
+<li>In <b>Settings</b> → <b>Apps</b> → <b>Shortcuts</b> → <b>Advanced</b>, turn on <b>Allow Deleting Without Confirmation</b>.</li>
+</ol>
+<h3>Every time</h3>
+<ol>
+<li>In SnapFade tap <b>Select</b>, pick the car photos in order, then <b>Share</b>.</li>
+<li>In the share sheet pick <b>SnapFade</b> (the first time it may be under <b>Edit Actions</b>; you can pin it to the top).</li>
+<li>In Facebook Marketplace tap <b>Add photos</b> → <b>Camera roll ▾</b> at the top → <b>SnapFade</b>.</li>
+</ol>`};
+$('fbGuideBtn').onclick = () => { $('fbGuide').innerHTML = GUIDE[LANG]; hide($('settings')); show($('fbSheet')); };
+$('fbClose').onclick = () => hide($('fbSheet'));
+$('fbSheet').onclick = e => { if (e.target === $('fbSheet')) hide($('fbSheet')); };
+$('orderHint').innerHTML = t('للماركت بليس: اختار <b>SnapFade</b> من قائمة المشاركة، وبفيسبوك افتح ألبوم SnapFade.');
 
 /* ---------- Face ID lock (passkey on this device) ---------- */
 const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));

@@ -436,9 +436,6 @@ textarea.notes:focus{border-color:var(--accent)}
     <h2>الإعدادات</h2>
     <h3>اللغة</h3>
     <div class="chips" id="langChips"></div>
-    <h3>الذكاء الاصطناعي (Claude)</h3>
-    <div class="addrow"><input id="apiKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…"><button class="hbtn on" id="apiSave">حفظ المفتاح</button></div>
-    <p style="margin-top:8px">المفتاح بيضل على جوالك بس، وبينبعت مباشرة لـ Anthropic. بتاخده من console.anthropic.com، وكل إعلان بيكلف تقريباً أقل من 5 سنت.</p>
     <h3>Facebook Marketplace</h3>
     <button class="wide" id="fbGuideBtn">طريقة الربط مع فيسبوك</button>
     <h3>قفل Face ID</h3>
@@ -458,7 +455,7 @@ textarea.notes:focus{border-color:var(--accent)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
-    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v11</p>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v12</p>
   </div>
 </div>
 
@@ -490,8 +487,7 @@ textarea.notes:focus{border-color:var(--accent)}
     <div class="form">
       <label><span>الشركة</span><input id="car_make" list="makes" placeholder="Toyota" autocomplete="off" autocapitalize="words"></label>
       <label><span>الموديل</span><input id="car_model" placeholder="Camry" autocomplete="off" autocapitalize="words"></label>
-      <label><span>الفئة</span><input id="car_trim" placeholder="SE, Limited…" autocomplete="off"></label>
-      <label><span>السنة</span><input id="car_year" type="number" inputmode="numeric" placeholder="2020"></label>
+      <label class="full"><span>السنة</span><input id="car_year" type="number" inputmode="numeric" placeholder="2020"></label>
       <label class="full"><span>الممشى</span><div class="row2"><input id="car_mileage" inputmode="numeric" placeholder="120000"><div class="chips" id="car_unit"></div></div></label>
       <div class="full"><span class="lbl">ناقل الحركة</span><div class="chips" id="car_trans"></div></div>
       <label class="full"><span>السعر (اختياري)</span><input id="car_price" inputmode="numeric" placeholder="15000"></label>
@@ -511,10 +507,6 @@ textarea.notes:focus{border-color:var(--accent)}
     <div class="chips" id="aiStyle"></div>
     <h3>لغة الإعلان</h3>
     <div class="chips" id="aiLang"></div>
-    <div class="keybox" id="aiNoKey" hidden>
-      <div>لازم مفتاح Claude API ليكتب التطبيق الإعلان بنفسه. أو انسخ الطلب والصقه بـ ChatGPT أو Claude.</div>
-      <div class="nact"><button id="aiCopyPrompt">انسخ الطلب</button><button id="aiAddKey">ضيف المفتاح</button></div>
-    </div>
     <button class="wide primary" id="aiGo"></button>
     <textarea class="notes" id="aiOut" hidden></textarea>
     <div id="aiActs" hidden><button class="primary" id="aiCopy">نسخ</button><button id="aiSave">حفظ بالألبوم</button></div>
@@ -616,24 +608,16 @@ const EN = {
   'شو بدك تضيف؟':'What do you want to add?', 'سيارة جديدة':'New car', 'ألبوم عادي':'Plain album',
   'ألبوم مع معلومات السيارة وإعلان جاهز':'An album with the car details and a ready-made listing',
   'لأي شي تاني بدك تصوره':'For anything else you want to shoot',
-  'معلومات السيارة':'Car details', 'الشركة':'Make', 'الموديل':'Model', 'الفئة':'Trim', 'السنة':'Year', 'الممشى':'Mileage',
+  'معلومات السيارة':'Car details', 'الشركة':'Make', 'الموديل':'Model', 'السنة':'Year', 'الممشى':'Mileage',
   'ناقل الحركة':'Transmission', 'السعر (اختياري)':'Price (optional)', 'ملاحظات أو مشاكل (اختياري)':'Notes or issues (optional)',
   'مثلاً: خدش على الباب، المكيف بدو صيانة…':'e.g. scratch on the door, A/C needs service…',
   'كم':'km', 'ميل':'mi', 'أوتوماتيك':'Automatic', 'عادي (يدوي)':'Manual',
   'حفظ وابدأ التصوير':'Save & start shooting', 'حفظ المعلومات':'Save details',
   'عبّي الشركة والموديل والسنة':'Fill in the make, model and year',
-  'كتابة الإعلان':'Write the listing', 'اكتب الإعلان':'Write listing', 'اكتب من جديد':'Write again', 'عم يكتب…':'Writing…',
   'الأسلوب':'Style', 'لغة الإعلان':'Listing language', 'احترافي':'Professional', 'عادي (متل شخص طبيعي)':'Casual (like a regular person)',
   'تعديل النص':'Edit text', 'حفظ بالألبوم':'Save to album', 'تم الحفظ':'Saved',
-  'لازم مفتاح Claude API ليكتب التطبيق الإعلان بنفسه. أو انسخ الطلب والصقه بـ ChatGPT أو Claude.':
-    'A Claude API key lets the app write the listing itself. Or copy the request and paste it into ChatGPT or Claude.',
-  'انسخ الطلب':'Copy request', 'ضيف المفتاح':'Add key',
-  'الذكاء الاصطناعي (Claude)':'AI (Claude)', 'حفظ المفتاح':'Save key', 'تم حفظ المفتاح':'Key saved', 'تم حذف المفتاح':'Key removed',
-  'المفتاح محفوظ ✓':'Key saved ✓',
-  'المفتاح بيضل على جوالك بس، وبينبعت مباشرة لـ Anthropic. بتاخده من console.anthropic.com، وكل إعلان بيكلف تقريباً أقل من 5 سنت.':
-    'The key stays on your phone and is sent only to Anthropic. Get one at console.anthropic.com; each listing costs roughly under 5 cents.',
-  'مفتاح API غير صحيح':'The API key is not valid', 'الخدمة مضغوطة، جرب بعد شوي':'The service is busy, try again shortly',
-  'ما في اتصال بالإنترنت':'No internet connection', 'تعذّرت كتابة الإعلان':'Could not write the listing',
+  'كتابة الإعلان':'Write the listing', 'اكتب الإعلان':'Write listing', 'اكتب من جديد':'Write again',
+  'يدوي (عادي)':'Manual', 'دبل كلتش (DCT)':'Dual-clutch (DCT)',
   'الكل':'All', 'قريب الحذف':'Expiring', 'تحديد الكل':'Select all', 'تراجع':'Undo',
   '{n} عنصر': p => items_en(p.n),
   'الحذف بعد {n} يوم':'Deleted after {n} days', 'بدون حذف تلقائي':'No auto-delete',
@@ -1509,7 +1493,7 @@ function noteCard(album){
   el.className = 'note';
   const add = (cls, txt) => { const d = document.createElement('div'); d.className = cls; d.textContent = txt; el.append(d); return d; };
   if (car){
-    add('ncar', [car.year, car.make, car.model, car.trim].filter(Boolean).join(' '));
+    add('ncar', [car.year, car.make, car.model].join(' '));
     add('nline', carLine(car));
     if (car.issues) add('nissue', car.issues);
   }
@@ -1706,13 +1690,179 @@ renderLockChips();
 lockNow();
 
 
+/* ---------- listing writer: runs on the phone, no AI service ---------- */
+const TRANS = {auto: ['أوتوماتيك', 'Automatic'], manual: ['يدوي (عادي)', 'Manual'], cvt: ['CVT', 'CVT'], dct: ['دبل كلتش (DCT)', 'Dual-clutch (DCT)']};
+const transName = (c, lang) => (TRANS[c.trans] || TRANS.auto)[lang === 'ar' ? 0 : 1];
+const pick = a => a[Math.floor(Math.random() * a.length)];
+// Issue types, checked in order: a name for when the seller wrote in the other language,
+// and honest positive angles per style and language.
+const ISSUES = [
+  {re: /a\/c|air ?con|compressor|freon|heater|\bac\b|مكيف|تكييف|كمبروسر|كمبريسور|فريون|تدفئة|شوفاج/i,
+   en: 'The A/C needs attention', ar: 'المكيف بحاجة لصيانة',
+   pro: {en: ['a common, affordable service item', 'typically a straightforward and inexpensive service'], ar: ['صيانة شائعة وتكلفتها بسيطة', 'إصلاح معتاد وغير مكلف عادةً']},
+   casual: {en: ['usually a quick and cheap fix', 'an easy service job'], ar: ['عادةً تصليحه سهل ورخيص', 'شغلة صيانة بسيطة']}},
+  {re: /check engine|engine light|warning|light|\bcel\b|لمب|ضو|إشار|اشار/i,
+   en: 'A warning light is on', ar: 'في لمبة تحذير ضاوية',
+   pro: {en: ['disclosed upfront and priced accordingly'], ar: ['مذكورة بكل وضوح والسعر يراعيها']},
+   casual: {en: ['priced with that in mind'], ar: ['ومحسوبة بالسعر']}},
+  {re: /leak|oil|seep|تهريب|ترشيح|زيت|نقط/i,
+   en: 'There is a small leak', ar: 'في تهريب بسيط',
+   pro: {en: ['priced with this in mind, and often a straightforward repair'], ar: ['السعر يراعي ذلك، وغالباً إصلاحه بسيط']},
+   casual: {en: ["usually an easy fix, and it's in the price"], ar: ['غالباً تصليحه سهل، ومحسوب بالسعر']}},
+  {re: /rust|corros|صدأ|صدا|صدي/i,
+   en: 'Some rust', ar: 'في شوية صدأ',
+   pro: {en: ['fully disclosed and reflected in the price'], ar: ['مذكور بشفافية ومحسوب بالسعر']},
+   casual: {en: ["nothing hidden, it's priced in"], ar: ['ما في شي مخبّى، ومحسوب بالسعر']}},
+  {re: /windshield|windscreen|crack|glass|زجاج|قزاز|شعر|كسر/i,
+   en: 'The windshield has a crack', ar: 'في شعر بالزجاج',
+   pro: {en: ['often covered by insurance, or a simple replacement'], ar: ['غالباً يغطيه التأمين أو يُبدَّل بسهولة']},
+   casual: {en: ['insurance usually covers it'], ar: ['التأمين عادةً بيغطيه']}},
+  {re: /tire|tyre|كفر|دولاب|دواليب|إطار|اطار/i,
+   en: 'The tires will need replacing soon', ar: 'الكفرات بحاجة لتبديل قريباً',
+   pro: {en: ['a routine replacement, and you get to choose the tires you want'], ar: ['تبديل روتيني، وتختار النوع الذي يناسبك']},
+   casual: {en: ['so you get to pick your own set'], ar: ['وبتنقّي النوع اللي بدك ياه']}},
+  {re: /brake|pad|rotor|بريك|فرامل|فحمات|ديسك/i,
+   en: 'The brakes are due for service', ar: 'الفرامل بحاجة لصيانة',
+   pro: {en: ['routine maintenance and inexpensive to do'], ar: ['صيانة دورية وتكلفتها بسيطة']},
+   casual: {en: ['normal wear, cheap to sort out'], ar: ['استهلاك طبيعي وتصليحها رخيص']}},
+  {re: /batter|بطاري/i,
+   en: 'The battery is weak', ar: 'البطارية ضعيفة',
+   pro: {en: ['a quick, low-cost replacement'], ar: ['تبديلها سريع وغير مكلف']},
+   casual: {en: ['a quick swap'], ar: ['بتتبدل بدقايق']}},
+  {re: /accident|salvage|rebuilt|title|حادث|حوادث|مصدوم|سالفج/i,
+   en: 'Previous accident history', ar: 'عليها حادث سابق',
+   pro: {en: ['disclosed upfront and reflected in the price'], ar: ['مذكور بكل شفافية ومحسوب بالسعر']},
+   casual: {en: ["I'm telling you upfront, and the price shows it"], ar: ['عم قلك من الأول، والسعر محسوب على هالأساس']}},
+  {re: /seat|interior|upholster|tear|stain|headliner|dash|carpet|فرش|تنجيد|مقعد|كراسي|كرسي|سقف|تابلو|موكيت/i,
+   en: 'Some interior wear', ar: 'في استهلاك بالداخلية',
+   pro: {en: ['cosmetic and easy to refresh'], ar: ['أمر شكلي وسهل تجديده']},
+   casual: {en: ['easy to freshen up'], ar: ['بتتجدد بسهولة']}},
+  {re: /window|lock|sensor|camera|radio|screen|bluetooth|speaker|electr|شباك|قفل|حساس|حسّاس|كاميرا|راديو|شاشة|سماع|كهرب/i,
+   en: 'A minor electrical item needs fixing', ar: 'في قطعة كهربائية بسيطة بدها تصليح',
+   pro: {en: ['a minor convenience item'], ar: ['أمر ثانوي يخص الكماليات']},
+   casual: {en: ['small stuff'], ar: ['شغلات صغيرة']}},
+  {re: /dent|scratch|scuff|paint|fad|clear ?coat|bumper|ding|خدش|دعس|ضرب|طعج|دهان|بوي|صبغ|قشر/i,
+   en: 'Some cosmetic marks', ar: 'بعض الملاحظات الشكلية',
+   pro: {en: ['cosmetic only and already reflected in the price', 'purely cosmetic, and priced accordingly'], ar: ['أمر شكلي فقط ومحسوب بالسعر', 'ملاحظة شكلية بحتة والسعر يراعيها']},
+   casual: {en: ['just cosmetic, nothing major', 'only cosmetic, and the price takes care of it'], ar: ['شغلة شكلية بس', 'شكليات بس، ومحسوبة بالسعر']}},
+  {re: /transmission|gearbox|shift|slip|engine|knock|noise|suspension|clunk|قير|جير|ناقل|محرك|موتور|ماتور|صوت|طقطق|تعليق|مساعد/i,
+   en: 'It has a mechanical issue', ar: 'في مشكلة ميكانيكية',
+   pro: {en: ['priced accordingly, and a great opportunity for a mechanic or someone handy'], ar: ['السعر يراعي ذلك، وهي فرصة ممتازة لميكانيكي أو لمن يفهم بالسيارات']},
+   casual: {en: ['a great deal for someone who can wrench'], ar: ['لقطة لحدا بيفهم بالميكانيك']}},
+];
+const OTHER = {pro: {en: ['disclosed upfront and reflected in the price'], ar: ['مذكور بشفافية ومحسوب بالسعر']},
+  casual: {en: ['and the price takes that into account'], ar: ['ومحسوب بالسعر']}};
+const isArabic = x => /[؀-ۿ]/.test(x);
+const cap = x => x.charAt(0).toUpperCase() + x.slice(1);
+
+function writeListing(c, style, lang){
+  const ar = lang === 'ar', pro = style === 'pro', out = [];
+  const name = c.make + ' ' + c.model;
+  const km = c.mileage ? fmtNum(c.mileage) + ' ' + (ar ? (c.unit === 'mi' ? 'ميل' : 'كم') : (c.unit === 'mi' ? 'miles' : 'km')) : '';
+  const price = c.price ? (/^\d+$/.test(c.price) ? '$' + fmtNum(c.price) : c.price) : '';
+  const trans = transName(c, lang);
+  const issues = (c.issues || '').split(/\n|,|،|؛|;|\.(?!\d)/).map(x => x.trim()).filter(Boolean).map(txt => {
+    const r = ISSUES.find(x => x.re.test(txt));
+    // keep the seller's own words unless they are in the other language
+    const text = isArabic(txt) === ar || !r ? txt : r[lang];
+    return {text: ar ? text : cap(text), spin: pick((r || OTHER)[style][lang])};
+  });
+  const age = new Date().getFullYear() - +c.year;
+  const kmValue = c.mileage ? +c.mileage * (c.unit === 'mi' ? 1.609 : 1) : 0;
+  const lowKm = kmValue > 0 && age > 0 && kmValue / age < 15000;
+  const reliable = /toyota|honda|lexus|mazda|subaru|acura/i.test(c.make);
+
+  if (!ar && pro){
+    out.push(c.year + ' ' + name + (km ? ' – ' + km : '') + (price ? ' – ' + price : ''), '');
+    out.push(pick(['Up for sale: ' + c.year + ' ' + name + (reliable ? ', from a brand known for its reliability' : '') + '.',
+      'Now available: a ' + c.year + ' ' + name + (reliable ? ', a name known for lasting' : '') + '.'])
+      + (lowKm ? ' Low mileage for its year.' : ''), '');
+    out.push('• Year: ' + c.year, '• Make & model: ' + name);
+    if (km) out.push('• Mileage: ' + km);
+    out.push('• Transmission: ' + trans);
+    if (price) out.push('• Price: ' + price);
+    if (issues.length){
+      out.push('', pick(['Full disclosure, so there are no surprises:', 'Being transparent about the details:']));
+      for (const i of issues) out.push('• ' + i.text + ' – ' + i.spin);
+    }
+    out.push('', pick(['Serious buyers, message me to arrange a viewing or a test drive.', 'Message me for more details or to book a viewing.']));
+  } else if (!ar){
+    out.push(pick(['Got a ' + c.year + ' ' + name + ' for sale 🚗', c.year + ' ' + name + ' for sale 🚗']));
+    out.push([km && km + ' on it', /auto|manual/.test(c.trans) ? trans.toLowerCase() : trans].filter(Boolean).join(', ') + '.'
+      + (lowKm ? ' Pretty low for the year.' : '')
+      + (reliable ? pick([' You know how ' + c.make + 's hold up.', ' Super reliable brand.']) : ''));
+    if (issues.length){
+      out.push('', 'Being upfront with you:');
+      for (const i of issues) out.push('- ' + i.text + ', ' + i.spin);
+    }
+    if (price) out.push('', 'Asking ' + price + (issues.length ? pick([', priced with all of that in mind.', ", and that's already factored in."]) : '.'));
+    out.push('', pick(["Message me if you're interested 👍", 'Shoot me a message if you want to come check it out 👍']));
+  } else if (pro){
+    out.push('للبيع: ' + name + ' موديل ' + c.year + (price ? ' – ' + price : ''), '');
+    out.push(pick([name + ' موديل ' + c.year + (reliable ? '، من ماركة معروفة بالاعتمادية' : '') + '، جاهزة لمالكها الجديد.',
+      'نعرض للبيع ' + name + ' موديل ' + c.year + (reliable ? '، من الماركات المعروفة بمتانتها' : '') + '.'])
+      + (lowKm ? ' ممشاها قليل بالنسبة لسنة الصنع.' : ''), '');
+    out.push('• سنة الصنع: ' + c.year, '• الماركة والموديل: ' + name);
+    if (km) out.push('• الممشى: ' + km);
+    out.push('• ناقل الحركة: ' + trans);
+    if (price) out.push('• السعر: ' + price);
+    if (issues.length){
+      out.push('', pick(['للأمانة وحتى تكون الصورة واضحة:', 'بكل شفافية:']));
+      for (const i of issues) out.push('• ' + i.text + '، ' + i.spin);
+    }
+    out.push('', pick(['للاستفسار أو لحجز موعد معاينة، تواصل معي برسالة.', 'للجادين فقط، راسلني لترتيب معاينة أو تجربة قيادة.']));
+  } else {
+    out.push(pick(['سيارة للبيع 🚗 ' + name + ' موديل ' + c.year, name + ' ' + c.year + ' للبيع 🚗']));
+    out.push([km && 'ماشية ' + km, trans].filter(Boolean).join('، ') + '.'
+      + (lowKm ? ' ممشاها قليل لسنتها.' : '') + (reliable ? ' وبتعرف ' + c.make + ' شو بتعمّر.' : ''));
+    if (issues.length){
+      out.push('', 'وبكل صراحة:');
+      for (const i of issues) out.push('- ' + i.text + '، ' + i.spin);
+    }
+    if (price) out.push('', 'السعر ' + price + (issues.length ? '، ومحسوب فيه كل شي.' : '.'));
+    out.push('', pick(['اللي مهتم يبعتلي رسالة 👍', 'أي سؤال راسلني 👍']));
+  }
+  return out.join('\n');
+}
+let aiAlbum = '', aiStyle = localStorage.getItem('aiStyle') || 'pro', aiLang = localStorage.getItem('aiLang') || 'en';
+function renderAIChips(){
+  chipRow($('aiStyle'), [['pro','احترافي'],['casual','عادي (متل شخص طبيعي)']], aiStyle,
+    v => { aiStyle = v; localStorage.setItem('aiStyle', v); renderAIChips(); });
+  chipRow($('aiLang'), [['en','English'],['ar','العربية']], aiLang,
+    v => { aiLang = v; localStorage.setItem('aiLang', v); renderAIChips(); });
+}
+function openAI(album){
+  aiAlbum = album;
+  const car = getCars()[album];
+  $('aiCar').textContent = [car.year, car.make, car.model].join(' ') + ' · ' + carLine(car);
+  renderAIChips();
+  $('aiOut').hidden = $('aiActs').hidden = true;
+  $('aiGo').textContent = '✨ ' + t('اكتب الإعلان');
+  show($('aiSheet'));
+}
+$('aiGo').onclick = () => {
+  $('aiOut').value = writeListing(getCars()[aiAlbum], aiStyle, aiLang);
+  $('aiOut').hidden = $('aiActs').hidden = false;
+  $('aiGo').textContent = '✨ ' + t('اكتب من جديد');
+};
+$('aiCopy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('aiOut').value); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
+};
+$('aiSave').onclick = () => {
+  const all = getNotes(); all[aiAlbum] = $('aiOut').value.trim();
+  localStorage.setItem('notes', JSON.stringify(all));
+  hide($('aiSheet')); render(); toast(t('تم الحفظ'));
+};
+$('aiSheet').onclick = e => { if (e.target === $('aiSheet')) hide($('aiSheet')); };
+localStorage.removeItem('apiKey');
+
 /* ---------- new car: details first, then straight to the camera ---------- */
 const getCars = () => JSON.parse(localStorage.getItem('cars') || '{}');
 const setCars = c => localStorage.setItem('cars', JSON.stringify(c));
 const fmtNum = v => /^\d+$/.test(v) ? Number(v).toLocaleString('en-US') : v;
 function carLine(c){
   return [c.mileage && fmtNum(c.mileage) + ' ' + t(c.unit === 'mi' ? 'ميل' : 'كم'),
-    t(c.trans === 'manual' ? 'عادي (يدوي)' : 'أوتوماتيك'),
+    transName(c, LANG),
     c.price && (/^\d+$/.test(c.price) ? '$' + fmtNum(c.price) : c.price)].filter(Boolean).join(' · ');
 }
 function chipRow(el, opts, cur, pick){
@@ -1726,9 +1876,9 @@ function chipRow(el, opts, cur, pick){
 let carEdit = null, carForm = {unit: 'km', trans: 'auto'};
 function renderCarChips(){
   chipRow($('car_unit'), [['km','كم'],['mi','ميل']], carForm.unit, v => { carForm.unit = v; renderCarChips(); });
-  chipRow($('car_trans'), [['auto','أوتوماتيك'],['manual','عادي (يدوي)']], carForm.trans, v => { carForm.trans = v; renderCarChips(); });
+  chipRow($('car_trans'), Object.entries(TRANS).map(([k, [a, e]]) => [k, LANG === 'ar' ? a : e]), carForm.trans, v => { carForm.trans = v; renderCarChips(); });
 }
-const CAR_FIELDS = ['make','model','trim','year','mileage','price','issues'];
+const CAR_FIELDS = ['make','model','year','mileage','price','issues'];
 function openCarForm(album){
   carEdit = album || null;
   const c = album ? getCars()[album] || {} : {};
@@ -1741,7 +1891,7 @@ function openCarForm(album){
 }
 $('carSave').onclick = () => {
   const v = k => $('car_' + k).value.trim();
-  const car = {make: v('make'), model: v('model'), trim: v('trim'), year: v('year'),
+  const car = {make: v('make'), model: v('model'), year: v('year'),
     mileage: v('mileage').replace(/[^\d]/g, ''), price: v('price'), issues: v('issues'),
     unit: carForm.unit, trans: carForm.trans};
   const miss = ['make','model','year'].find(k => !car[k]);
@@ -1749,7 +1899,7 @@ $('carSave').onclick = () => {
   document.activeElement?.blur?.();
   let album = carEdit;
   if (!album){
-    const base = [car.year, car.make, car.model, car.trim].filter(Boolean).join(' '), taken = new Set(albums());
+    const base = [car.year, car.make, car.model].join(' '), taken = new Set(albums());
     album = base;
     for (let i = 2; taken.has(album); i++) album = base + ' (' + i + ')';
     localStorage.setItem('albums', JSON.stringify([...savedAlbums(), album]));
@@ -1764,106 +1914,6 @@ $('carSheet').onclick = e => { if (e.target === $('carSheet')) hide($('carSheet'
 $('newSheet').onclick = e => { if (e.target === $('newSheet')) hide($('newSheet')); };
 $('newCar').onclick = () => { hide($('newSheet')); openCarForm(); };
 $('newAlbum').onclick = () => { hide($('newSheet')); openAlbumSheet('create'); };
-
-/* ---------- AI listing writer (Claude) ---------- */
-const SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.131.0/+esm';
-const AD_SYSTEM = `You write Facebook Marketplace listings for used cars.
-
-Write the listing in the language and style the request asks for:
-- Professional: a polished, dealer-quality listing. A strong title line, a short intro, then the key details as a clean list with "•" bullets, and a closing line inviting buyers to message.
-- Casual: sounds like a regular person selling their own car. Warm and natural, short sentences, the way real Marketplace posts read. No corporate wording, at most one or two emoji.
-For Arabic, write casual listings in a natural Levantine (Syrian) tone and professional ones in clear Modern Standard Arabic. Keep make, model and trim names and all numbers in English characters.
-
-Every issue the seller lists must appear in the listing: buyers rely on it, and hiding a defect breaks their trust and Marketplace's rules. Present each issue honestly but constructively. State it plainly, then give a positive angle that is actually true, such as the price already reflecting it, it being a simple or inexpensive fix, a chance to get the car for less, or everything else being solid. Never describe a defect as something it isn't, never downplay a safety problem, and never invent features, history or condition details the seller didn't give.
-
-Output only the listing text, ready to paste: plain text, no markdown headings or asterisks, no notes to the seller.`;
-function adRequest(car, style, lang){
-  return [
-    'Style: ' + (style === 'pro' ? 'Professional' : 'Casual'),
-    'Language: ' + (lang === 'ar' ? 'Arabic' : 'English'),
-    '', 'Car:',
-    'Year: ' + car.year, 'Make: ' + car.make, 'Model: ' + car.model,
-    'Trim: ' + (car.trim || 'not given'),
-    'Mileage: ' + (car.mileage ? fmtNum(car.mileage) + ' ' + (car.unit === 'mi' ? 'miles' : 'km') : 'not given'),
-    'Transmission: ' + (car.trans === 'manual' ? 'Manual' : 'Automatic'),
-    'Asking price: ' + (car.price ? (/^\d+$/.test(car.price) ? '$' + fmtNum(car.price) : car.price) : "not given - don't mention a price"),
-    "Seller's notes and issues: " + (car.issues || 'none'),
-  ].join('\n');
-}
-let aiAlbum = '', aiStyle = localStorage.getItem('aiStyle') || 'pro', aiLang = localStorage.getItem('aiLang') || 'en';
-function renderAIChips(){
-  chipRow($('aiStyle'), [['pro','احترافي'],['casual','عادي (متل شخص طبيعي)']], aiStyle,
-    v => { aiStyle = v; localStorage.setItem('aiStyle', v); renderAIChips(); });
-  chipRow($('aiLang'), [['en','English'],['ar','العربية']], aiLang,
-    v => { aiLang = v; localStorage.setItem('aiLang', v); renderAIChips(); });
-}
-function openAI(album){
-  aiAlbum = album;
-  const car = getCars()[album];
-  $('aiCar').textContent = [car.year, car.make, car.model, car.trim].filter(Boolean).join(' ') + ' · ' + carLine(car);
-  renderAIChips();
-  $('aiNoKey').hidden = !!localStorage.getItem('apiKey');
-  $('aiOut').hidden = $('aiActs').hidden = true;
-  $('aiGo').disabled = false; $('aiGo').textContent = '✨ ' + t('اكتب الإعلان');
-  show($('aiSheet'));
-}
-$('aiGo').onclick = async () => {
-  const key = localStorage.getItem('apiKey');
-  if (!key){ $('aiNoKey').hidden = false; return; }
-  const car = getCars()[aiAlbum];
-  $('aiGo').disabled = true;
-  $('aiGo').innerHTML = '<i class="spin"></i>'; $('aiGo').append(t('عم يكتب…'));
-  try {
-    const {default: Anthropic} = await import(SDK_URL);
-    const client = new Anthropic({apiKey: key, dangerouslyAllowBrowser: true});
-    const res = await client.beta.messages.create({
-      model: 'claude-opus-5-5',
-      max_tokens: 16000,
-      output_config: {effort: 'low'},
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
-      system: AD_SYSTEM,
-      messages: [{role: 'user', content: adRequest(car, aiStyle, aiLang)}],
-    });
-    if (res.stop_reason === 'refusal') throw new Error('refusal');
-    const text = res.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
-    if (!text) throw new Error('empty');
-    $('aiOut').value = text;
-    $('aiOut').hidden = $('aiActs').hidden = false;
-    $('aiGo').textContent = '✨ ' + t('اكتب من جديد');
-  } catch(e){
-    $('aiGo').textContent = '✨ ' + t('اكتب الإعلان');
-    toast(t(e.status === 401 ? 'مفتاح API غير صحيح' : e.status === 429 || e.status === 529 ? 'الخدمة مضغوطة، جرب بعد شوي'
-      : !navigator.onLine ? 'ما في اتصال بالإنترنت' : 'تعذّرت كتابة الإعلان'));
-  }
-  $('aiGo').disabled = false;
-};
-$('aiCopy').onclick = async () => {
-  try { await navigator.clipboard.writeText($('aiOut').value); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
-};
-$('aiSave').onclick = () => {
-  const all = getNotes(); all[aiAlbum] = $('aiOut').value.trim();
-  localStorage.setItem('notes', JSON.stringify(all));
-  hide($('aiSheet')); render(); toast(t('تم الحفظ'));
-};
-// No key: hand the same request to any chat app
-$('aiCopyPrompt').onclick = async () => {
-  const req = AD_SYSTEM + '\n\n' + adRequest(getCars()[aiAlbum], aiStyle, aiLang);
-  try { await navigator.clipboard.writeText(req); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
-};
-$('aiAddKey').onclick = () => { hide($('aiSheet')); $('btnSettings').click(); setTimeout(() => $('apiKey').focus(), 450); };
-$('aiSheet').onclick = e => { if (e.target === $('aiSheet')) hide($('aiSheet')); };
-function renderKeyField(){
-  $('apiKey').value = '';
-  $('apiKey').placeholder = localStorage.getItem('apiKey') ? t('المفتاح محفوظ ✓') : 'sk-ant-…';
-}
-$('apiSave').onclick = () => {
-  const k = $('apiKey').value.trim();
-  if (k){ localStorage.setItem('apiKey', k); toast(t('تم حفظ المفتاح')); }
-  else if (localStorage.getItem('apiKey')){ localStorage.removeItem('apiKey'); toast(t('تم حذف المفتاح')); }
-  $('apiKey').blur(); renderKeyField();
-};
-renderKeyField();
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden){

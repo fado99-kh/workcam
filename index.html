@@ -318,6 +318,8 @@ textarea.notes:focus{border-color:var(--accent)}
 #aiActs button{flex:1;height:42px;border-radius:12px;background:var(--panel2);font-size:14px}
 #aiActs button.primary{background:var(--accent);color:#111;font-weight:700}
 #aiGo:disabled{opacity:.7}
+#aiOut.swap{animation:swap .35s var(--ease)}
+@keyframes swap{from{opacity:.2;transform:translateY(6px)}}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid #111;border-top-color:transparent;border-radius:50%;
   animation:spin .8s linear infinite;vertical-align:-2px;margin-inline-end:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -457,7 +459,7 @@ textarea.notes:focus{border-color:var(--accent)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
-    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v13</p>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v14</p>
   </div>
 </div>
 
@@ -517,7 +519,7 @@ textarea.notes:focus{border-color:var(--accent)}
     <div class="chips" id="aiLang"></div>
     <button class="wide primary" id="aiGo"></button>
     <textarea class="notes" id="aiOut" hidden></textarea>
-    <div id="aiActs" hidden><button class="primary" id="aiCopy">نسخ</button><button id="aiSave">حفظ بالألبوم</button></div>
+    <div id="aiActs" hidden><button id="aiAgain">🔄 <span>صياغة تانية</span></button><button class="primary" id="aiCopy">نسخ</button><button id="aiSave">حفظ بالألبوم</button></div>
   </div>
 </div>
 
@@ -625,7 +627,7 @@ const EN = {
   'حفظ وابدأ التصوير':'Save & start shooting', 'حفظ المعلومات':'Save details',
   'عبّي الشركة والموديل والسنة':'Fill in the make, model and year',
   'الأسلوب':'Style', 'لغة الإعلان':'Listing language', 'احترافي':'Professional', 'عادي (متل شخص طبيعي)':'Casual (like a regular person)',
-  'تعديل النص':'Edit text', 'حفظ بالألبوم':'Save to album', 'تم الحفظ':'Saved',
+  'صياغة تانية':'Rewrite', 'تعديل النص':'Edit text', 'حفظ بالألبوم':'Save to album', 'تم الحفظ':'Saved',
   'كتابة الإعلان':'Write the listing', 'اكتب الإعلان':'Write listing', 'اكتب من جديد':'Write again',
   'يدوي (عادي)':'Manual', 'دبل كلتش (DCT)':'Dual-clutch (DCT)',
   'الكل':'All', 'قريب الحذف':'Expiring', 'تحديد الكل':'Select all', 'تراجع':'Undo',
@@ -1899,9 +1901,12 @@ function writeListing(c, style, lang){
 let aiAlbum = '', aiStyle = localStorage.getItem('aiStyle') || 'pro', aiLang = localStorage.getItem('aiLang') || 'en';
 function renderAIChips(){
   chipRow($('aiStyle'), [['pro','احترافي'],['casual','عادي (متل شخص طبيعي)']], aiStyle,
-    v => { aiStyle = v; localStorage.setItem('aiStyle', v); renderAIChips(); });
+    v => { aiStyle = v; localStorage.setItem('aiStyle', v); renderAIChips(); redraft(); });
   chipRow($('aiLang'), [['en','English'],['ar','العربية']], aiLang,
-    v => { aiLang = v; localStorage.setItem('aiLang', v); renderAIChips(); });
+    v => { aiLang = v; localStorage.setItem('aiLang', v); renderAIChips(); redraft(); });
+}
+// changing style or language rewrites a draft that is already showing
+function redraft(){ if (!$('aiOut').hidden) $('aiGo').onclick();
 }
 function openAI(album){
   aiAlbum = album;
@@ -1910,6 +1915,7 @@ function openAI(album){
   renderAIChips();
   $('aiOut').hidden = $('aiActs').hidden = true;
   $('aiOut').value = '';
+  $('aiGo').hidden = false;
   $('aiGo').textContent = '✨ ' + t('اكتب الإعلان');
   show($('aiSheet'));
 }
@@ -1919,9 +1925,13 @@ $('aiGo').onclick = () => {
   let text = writeListing(car, aiStyle, aiLang);
   for (let i = 0; i < 12 && text === prev; i++) text = writeListing(car, aiStyle, aiLang);
   $('aiOut').value = text;
+  $('aiOut').dir = aiLang === 'ar' ? 'rtl' : 'ltr';
   $('aiOut').hidden = $('aiActs').hidden = false;
-  $('aiGo').textContent = '✨ ' + t('اكتب من جديد');
+  // once there is a draft, the rewrite button sits under it
+  $('aiGo').hidden = true;
+  const o = $('aiOut'); o.classList.remove('swap'); void o.offsetWidth; o.classList.add('swap');
 };
+$('aiAgain').onclick = () => $('aiGo').onclick();
 $('aiCopy').onclick = async () => {
   try { await navigator.clipboard.writeText($('aiOut').value); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
 };

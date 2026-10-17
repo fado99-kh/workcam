@@ -286,6 +286,40 @@ textarea.notes:focus{border-color:var(--accent)}
 .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6}
 .hint b{color:var(--accent)}
 
+
+/* new car form */
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.form .full{grid-column:1/-1}
+.form label,.form .full{display:flex;flex-direction:column;gap:6px}
+.form span,.lbl{font-size:12px;color:var(--muted);font-weight:600}
+.form input{height:44px;width:100%;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);
+  font:inherit;font-size:16px;padding:0 12px;outline:none;transition:border-color var(--t-fast)}
+.form input:focus,.form textarea:focus{border-color:var(--accent)}
+.form textarea.notes{min-height:96px;margin-top:0;font-size:16px}
+.row2{display:flex;gap:8px;align-items:center}
+.row2 input{flex:1;min-width:0}
+.row2 .chips{flex-wrap:nowrap}
+.bigrow{display:flex;align-items:center;gap:14px;padding:16px 6px;border-bottom:1px solid var(--line);text-align:start;width:100%}
+.bigrow .ic{width:30px;height:30px;color:var(--accent);flex:none}
+.bigrow b{display:block;font-size:16px}
+.bigrow small{color:var(--muted);font-size:13px}
+.note .ncar{font-weight:700;font-size:16px;margin-bottom:2px}
+.note .nline{color:var(--muted);font-size:13px}
+.note .nissue{font-size:13px;color:#ffb4a8;margin-top:6px;white-space:pre-wrap}
+.note .nsep{height:1px;background:var(--line);margin:12px 0}
+.note .nact{flex-wrap:wrap}
+.keybox{margin-top:16px;padding:12px 14px;border-radius:12px;background:#2a2412;border:1px solid #5a4a16;font-size:13px;line-height:1.7}
+.keybox .nact{display:flex;gap:8px;margin-top:10px}
+.keybox .nact button{height:34px;padding:0 14px;border-radius:17px;background:var(--panel2);font-size:13px}
+#aiOut{min-height:260px}
+#aiActs{display:flex;gap:8px;margin-top:10px}
+#aiActs button{flex:1;height:42px;border-radius:12px;background:var(--panel2);font-size:14px}
+#aiActs button.primary{background:var(--accent);color:#111;font-weight:700}
+#aiGo:disabled{opacity:.7}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #111;border-top-color:transparent;border-radius:50%;
+  animation:spin .8s linear infinite;vertical-align:-2px;margin-inline-end:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -309,6 +343,8 @@ textarea.notes:focus{border-color:var(--accent)}
   <symbol id="i-paste" viewBox="0 0 24 24"><path d="M9 4h6v3H9zM8 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2"/></symbol>
   <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 16V11l2-5h10l2 5v5M3 16h18v3H3zM5 11h14"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
 </svg>
@@ -400,6 +436,9 @@ textarea.notes:focus{border-color:var(--accent)}
     <h2>الإعدادات</h2>
     <h3>اللغة</h3>
     <div class="chips" id="langChips"></div>
+    <h3>الذكاء الاصطناعي (Claude)</h3>
+    <div class="addrow"><input id="apiKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…"><button class="hbtn on" id="apiSave">حفظ المفتاح</button></div>
+    <p style="margin-top:8px">المفتاح بيضل على جوالك بس، وبينبعت مباشرة لـ Anthropic. بتاخده من console.anthropic.com، وكل إعلان بيكلف تقريباً أقل من 5 سنت.</p>
     <h3>Facebook Marketplace</h3>
     <button class="wide" id="fbGuideBtn">طريقة الربط مع فيسبوك</button>
     <h3>قفل Face ID</h3>
@@ -419,7 +458,7 @@ textarea.notes:focus{border-color:var(--accent)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
-    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v10</p>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v11</p>
   </div>
 </div>
 
@@ -432,6 +471,53 @@ textarea.notes:focus{border-color:var(--accent)}
       <input id="albumName" maxlength="40" enterkeyhint="done" placeholder="اسم ألبوم جديد (مثلاً: كامري 2020)">
       <button class="hbtn on" id="albumAdd">إضافة</button>
     </div>
+  </div>
+</div>
+
+<div class="scrim" id="newSheet" hidden>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2>شو بدك تضيف؟</h2>
+    <button class="bigrow" id="newCar"><svg class="ic"><use href="#i-car"/></svg><span><b>سيارة جديدة</b><small>ألبوم مع معلومات السيارة وإعلان جاهز</small></span></button>
+    <button class="bigrow" id="newAlbum"><svg class="ic"><use href="#i-folder"/></svg><span><b>ألبوم عادي</b><small>لأي شي تاني بدك تصوره</small></span></button>
+  </div>
+</div>
+
+<div class="scrim" id="carSheet" hidden>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="carTitle"></h2>
+    <div class="form">
+      <label><span>الشركة</span><input id="car_make" list="makes" placeholder="Toyota" autocomplete="off" autocapitalize="words"></label>
+      <label><span>الموديل</span><input id="car_model" placeholder="Camry" autocomplete="off" autocapitalize="words"></label>
+      <label><span>الفئة</span><input id="car_trim" placeholder="SE, Limited…" autocomplete="off"></label>
+      <label><span>السنة</span><input id="car_year" type="number" inputmode="numeric" placeholder="2020"></label>
+      <label class="full"><span>الممشى</span><div class="row2"><input id="car_mileage" inputmode="numeric" placeholder="120000"><div class="chips" id="car_unit"></div></div></label>
+      <div class="full"><span class="lbl">ناقل الحركة</span><div class="chips" id="car_trans"></div></div>
+      <label class="full"><span>السعر (اختياري)</span><input id="car_price" inputmode="numeric" placeholder="15000"></label>
+      <label class="full"><span>ملاحظات أو مشاكل (اختياري)</span><textarea class="notes" id="car_issues" placeholder="مثلاً: خدش على الباب، المكيف بدو صيانة…"></textarea></label>
+    </div>
+    <button class="wide primary" id="carSave"></button>
+  </div>
+</div>
+<datalist id="makes"><option value="Toyota"><option value="Honda"><option value="Ford"><option value="Chevrolet"><option value="GMC"><option value="Ram"><option value="Dodge"><option value="Jeep"><option value="Chrysler"><option value="Nissan"><option value="Hyundai"><option value="Kia"><option value="Mazda"><option value="Subaru"><option value="Volkswagen"><option value="BMW"><option value="Mercedes-Benz"><option value="Audi"><option value="Lexus"><option value="Acura"><option value="Infiniti"><option value="Tesla"><option value="Mitsubishi"><option value="Volvo"><option value="Cadillac"><option value="Buick"><option value="Lincoln"><option value="Porsche"><option value="Land Rover"><option value="Mini"><option value="Genesis"></datalist>
+
+<div class="scrim" id="aiSheet" hidden>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2>كتابة الإعلان</h2>
+    <p id="aiCar"></p>
+    <h3>الأسلوب</h3>
+    <div class="chips" id="aiStyle"></div>
+    <h3>لغة الإعلان</h3>
+    <div class="chips" id="aiLang"></div>
+    <div class="keybox" id="aiNoKey" hidden>
+      <div>لازم مفتاح Claude API ليكتب التطبيق الإعلان بنفسه. أو انسخ الطلب والصقه بـ ChatGPT أو Claude.</div>
+      <div class="nact"><button id="aiCopyPrompt">انسخ الطلب</button><button id="aiAddKey">ضيف المفتاح</button></div>
+    </div>
+    <button class="wide primary" id="aiGo"></button>
+    <textarea class="notes" id="aiOut" hidden></textarea>
+    <div id="aiActs" hidden><button class="primary" id="aiCopy">نسخ</button><button id="aiSave">حفظ بالألبوم</button></div>
   </div>
 </div>
 
@@ -527,6 +613,27 @@ const EN = {
   'يطلب Face ID عند فتح التطبيق وبعد دقيقة من الخروج منه.':'Asks for Face ID when the app opens and after a minute away.',
   'طريقة الربط مع فيسبوك':'How to connect to Facebook',
   'للماركت بليس: اختار <b>SnapFade</b> من قائمة المشاركة، وبفيسبوك افتح ألبوم SnapFade.':'For Marketplace: pick <b>SnapFade</b> in the share sheet, then open the SnapFade album in Facebook.',
+  'شو بدك تضيف؟':'What do you want to add?', 'سيارة جديدة':'New car', 'ألبوم عادي':'Plain album',
+  'ألبوم مع معلومات السيارة وإعلان جاهز':'An album with the car details and a ready-made listing',
+  'لأي شي تاني بدك تصوره':'For anything else you want to shoot',
+  'معلومات السيارة':'Car details', 'الشركة':'Make', 'الموديل':'Model', 'الفئة':'Trim', 'السنة':'Year', 'الممشى':'Mileage',
+  'ناقل الحركة':'Transmission', 'السعر (اختياري)':'Price (optional)', 'ملاحظات أو مشاكل (اختياري)':'Notes or issues (optional)',
+  'مثلاً: خدش على الباب، المكيف بدو صيانة…':'e.g. scratch on the door, A/C needs service…',
+  'كم':'km', 'ميل':'mi', 'أوتوماتيك':'Automatic', 'عادي (يدوي)':'Manual',
+  'حفظ وابدأ التصوير':'Save & start shooting', 'حفظ المعلومات':'Save details',
+  'عبّي الشركة والموديل والسنة':'Fill in the make, model and year',
+  'كتابة الإعلان':'Write the listing', 'اكتب الإعلان':'Write listing', 'اكتب من جديد':'Write again', 'عم يكتب…':'Writing…',
+  'الأسلوب':'Style', 'لغة الإعلان':'Listing language', 'احترافي':'Professional', 'عادي (متل شخص طبيعي)':'Casual (like a regular person)',
+  'تعديل النص':'Edit text', 'حفظ بالألبوم':'Save to album', 'تم الحفظ':'Saved',
+  'لازم مفتاح Claude API ليكتب التطبيق الإعلان بنفسه. أو انسخ الطلب والصقه بـ ChatGPT أو Claude.':
+    'A Claude API key lets the app write the listing itself. Or copy the request and paste it into ChatGPT or Claude.',
+  'انسخ الطلب':'Copy request', 'ضيف المفتاح':'Add key',
+  'الذكاء الاصطناعي (Claude)':'AI (Claude)', 'حفظ المفتاح':'Save key', 'تم حفظ المفتاح':'Key saved', 'تم حذف المفتاح':'Key removed',
+  'المفتاح محفوظ ✓':'Key saved ✓',
+  'المفتاح بيضل على جوالك بس، وبينبعت مباشرة لـ Anthropic. بتاخده من console.anthropic.com، وكل إعلان بيكلف تقريباً أقل من 5 سنت.':
+    'The key stays on your phone and is sent only to Anthropic. Get one at console.anthropic.com; each listing costs roughly under 5 cents.',
+  'مفتاح API غير صحيح':'The API key is not valid', 'الخدمة مضغوطة، جرب بعد شوي':'The service is busy, try again shortly',
+  'ما في اتصال بالإنترنت':'No internet connection', 'تعذّرت كتابة الإعلان':'Could not write the listing',
   'الكل':'All', 'قريب الحذف':'Expiring', 'تحديد الكل':'Select all', 'تراجع':'Undo',
   '{n} عنصر': p => items_en(p.n),
   'الحذف بعد {n} يوم':'Deleted after {n} days', 'بدون حذف تلقائي':'No auto-delete',
@@ -749,7 +856,7 @@ function renderFilters(){
   });
   const add = document.createElement('button');
   add.className = 'fchip add'; add.textContent = '+'; add.setAttribute('aria-label', t('ألبوم جديد'));
-  add.onclick = () => openAlbumSheet('create');
+  add.onclick = () => show($('newSheet'));
   $('filters').replaceChildren(...nodes, add);
 }
 let albumMode = 'create';
@@ -823,6 +930,7 @@ function render(){
     if (inAlbum) main.prepend(noteCard(filter.slice(2)));
     if (inAlbum) $('albumDel').onclick = () => {
       const notes = getNotes(); delete notes[filter.slice(2)]; localStorage.setItem('notes', JSON.stringify(notes));
+      const cars = getCars(); delete cars[filter.slice(2)]; setCars(cars);
       localStorage.setItem('albums', JSON.stringify(savedAlbums().filter(a => a !== filter.slice(2))));
       filter = 'all'; render();
     };
@@ -1388,25 +1496,42 @@ document.addEventListener('paste', async e => {
 /* ---------- album notes ---------- */
 const getNotes = () => JSON.parse(localStorage.getItem('notes') || '{}');
 function noteCard(album){
-  const text = getNotes()[album] || '';
-  const el = document.createElement(text ? 'div' : 'button');
-  if (!text){
+  const car = getCars()[album], text = getNotes()[album] || '';
+  if (!car && !text){
+    const el = document.createElement('button');
     el.className = 'note blank';
     el.innerHTML = '<svg class="ic"><use href="#i-note"/></svg>';
     el.append(t('أضف السعر والممشى ونص الإعلان'));
     el.onclick = () => openNotes(album);
     return el;
   }
+  const el = document.createElement('div');
   el.className = 'note';
-  el.innerHTML = '<h4><svg class="ic" style="width:15px;height:15px"><use href="#i-note"/></svg></h4><div class="ntext"></div><div class="nact"><button class="primary"></button><button></button></div>';
-  el.querySelector('h4').append(t('ملاحظات الإعلان'));
-  el.querySelector('.ntext').textContent = text;
-  const [copy, edit] = el.querySelectorAll('.nact button');
-  copy.textContent = t('نسخ'); edit.textContent = t('تعديل');
-  copy.onclick = async () => {
-    try { await navigator.clipboard.writeText(text); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
+  const add = (cls, txt) => { const d = document.createElement('div'); d.className = cls; d.textContent = txt; el.append(d); return d; };
+  if (car){
+    add('ncar', [car.year, car.make, car.model, car.trim].filter(Boolean).join(' '));
+    add('nline', carLine(car));
+    if (car.issues) add('nissue', car.issues);
+  }
+  if (car && text) add('nsep', '');
+  if (text){
+    const h = document.createElement('h4');
+    h.innerHTML = '<svg class="ic" style="width:15px;height:15px"><use href="#i-note"/></svg>';
+    h.append(t('ملاحظات الإعلان')); el.append(h);
+    add('ntext', text);
+  }
+  const acts = document.createElement('div'); acts.className = 'nact'; el.append(acts);
+  const btn = (label, fn, primary) => {
+    const b = document.createElement('button'); b.textContent = label; b.onclick = fn;
+    if (primary) b.className = 'primary';
+    acts.append(b);
   };
-  edit.onclick = () => openNotes(album);
+  if (car) btn('✨ ' + t('اكتب الإعلان'), () => openAI(album), true);
+  if (text) btn(t('نسخ'), async () => {
+    try { await navigator.clipboard.writeText(text); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
+  }, !car);
+  if (text) btn(t(car ? 'تعديل النص' : 'تعديل'), () => openNotes(album));
+  if (car) btn(t('معلومات السيارة'), () => openCarForm(album));
   return el;
 }
 let noteAlbum = '';
@@ -1579,6 +1704,166 @@ async function setLock(on){
 }
 renderLockChips();
 lockNow();
+
+
+/* ---------- new car: details first, then straight to the camera ---------- */
+const getCars = () => JSON.parse(localStorage.getItem('cars') || '{}');
+const setCars = c => localStorage.setItem('cars', JSON.stringify(c));
+const fmtNum = v => /^\d+$/.test(v) ? Number(v).toLocaleString('en-US') : v;
+function carLine(c){
+  return [c.mileage && fmtNum(c.mileage) + ' ' + t(c.unit === 'mi' ? 'ميل' : 'كم'),
+    t(c.trans === 'manual' ? 'عادي (يدوي)' : 'أوتوماتيك'),
+    c.price && (/^\d+$/.test(c.price) ? '$' + fmtNum(c.price) : c.price)].filter(Boolean).join(' · ');
+}
+function chipRow(el, opts, cur, pick){
+  el.replaceChildren(...opts.map(([v, label]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip' + (v === cur ? ' on' : '');
+    b.textContent = t(label); b.onclick = () => pick(v);
+    return b;
+  }));
+}
+let carEdit = null, carForm = {unit: 'km', trans: 'auto'};
+function renderCarChips(){
+  chipRow($('car_unit'), [['km','كم'],['mi','ميل']], carForm.unit, v => { carForm.unit = v; renderCarChips(); });
+  chipRow($('car_trans'), [['auto','أوتوماتيك'],['manual','عادي (يدوي)']], carForm.trans, v => { carForm.trans = v; renderCarChips(); });
+}
+const CAR_FIELDS = ['make','model','trim','year','mileage','price','issues'];
+function openCarForm(album){
+  carEdit = album || null;
+  const c = album ? getCars()[album] || {} : {};
+  for (const k of CAR_FIELDS) $('car_' + k).value = c[k] || '';
+  carForm = {unit: c.unit || 'km', trans: c.trans || 'auto'};
+  renderCarChips();
+  $('carTitle').textContent = t(album ? 'معلومات السيارة' : 'سيارة جديدة');
+  $('carSave').textContent = t(album ? 'حفظ المعلومات' : 'حفظ وابدأ التصوير');
+  show($('carSheet'));
+}
+$('carSave').onclick = () => {
+  const v = k => $('car_' + k).value.trim();
+  const car = {make: v('make'), model: v('model'), trim: v('trim'), year: v('year'),
+    mileage: v('mileage').replace(/[^\d]/g, ''), price: v('price'), issues: v('issues'),
+    unit: carForm.unit, trans: carForm.trans};
+  const miss = ['make','model','year'].find(k => !car[k]);
+  if (miss){ $('car_' + miss).focus(); return toast(t('عبّي الشركة والموديل والسنة')); }
+  document.activeElement?.blur?.();
+  let album = carEdit;
+  if (!album){
+    const base = [car.year, car.make, car.model, car.trim].filter(Boolean).join(' '), taken = new Set(albums());
+    album = base;
+    for (let i = 2; taken.has(album); i++) album = base + ' (' + i + ')';
+    localStorage.setItem('albums', JSON.stringify([...savedAlbums(), album]));
+  }
+  const cars = getCars(); cars[album] = car; setCars(cars);
+  hide($('carSheet'));
+  filter = 'a:' + album; render();
+  // photos taken now go straight into this car's album
+  if (!carEdit) $('btnCam').onclick();
+};
+$('carSheet').onclick = e => { if (e.target === $('carSheet')) hide($('carSheet')); };
+$('newSheet').onclick = e => { if (e.target === $('newSheet')) hide($('newSheet')); };
+$('newCar').onclick = () => { hide($('newSheet')); openCarForm(); };
+$('newAlbum').onclick = () => { hide($('newSheet')); openAlbumSheet('create'); };
+
+/* ---------- AI listing writer (Claude) ---------- */
+const SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.131.0/+esm';
+const AD_SYSTEM = `You write Facebook Marketplace listings for used cars.
+
+Write the listing in the language and style the request asks for:
+- Professional: a polished, dealer-quality listing. A strong title line, a short intro, then the key details as a clean list with "•" bullets, and a closing line inviting buyers to message.
+- Casual: sounds like a regular person selling their own car. Warm and natural, short sentences, the way real Marketplace posts read. No corporate wording, at most one or two emoji.
+For Arabic, write casual listings in a natural Levantine (Syrian) tone and professional ones in clear Modern Standard Arabic. Keep make, model and trim names and all numbers in English characters.
+
+Every issue the seller lists must appear in the listing: buyers rely on it, and hiding a defect breaks their trust and Marketplace's rules. Present each issue honestly but constructively. State it plainly, then give a positive angle that is actually true, such as the price already reflecting it, it being a simple or inexpensive fix, a chance to get the car for less, or everything else being solid. Never describe a defect as something it isn't, never downplay a safety problem, and never invent features, history or condition details the seller didn't give.
+
+Output only the listing text, ready to paste: plain text, no markdown headings or asterisks, no notes to the seller.`;
+function adRequest(car, style, lang){
+  return [
+    'Style: ' + (style === 'pro' ? 'Professional' : 'Casual'),
+    'Language: ' + (lang === 'ar' ? 'Arabic' : 'English'),
+    '', 'Car:',
+    'Year: ' + car.year, 'Make: ' + car.make, 'Model: ' + car.model,
+    'Trim: ' + (car.trim || 'not given'),
+    'Mileage: ' + (car.mileage ? fmtNum(car.mileage) + ' ' + (car.unit === 'mi' ? 'miles' : 'km') : 'not given'),
+    'Transmission: ' + (car.trans === 'manual' ? 'Manual' : 'Automatic'),
+    'Asking price: ' + (car.price ? (/^\d+$/.test(car.price) ? '$' + fmtNum(car.price) : car.price) : "not given - don't mention a price"),
+    "Seller's notes and issues: " + (car.issues || 'none'),
+  ].join('\n');
+}
+let aiAlbum = '', aiStyle = localStorage.getItem('aiStyle') || 'pro', aiLang = localStorage.getItem('aiLang') || 'en';
+function renderAIChips(){
+  chipRow($('aiStyle'), [['pro','احترافي'],['casual','عادي (متل شخص طبيعي)']], aiStyle,
+    v => { aiStyle = v; localStorage.setItem('aiStyle', v); renderAIChips(); });
+  chipRow($('aiLang'), [['en','English'],['ar','العربية']], aiLang,
+    v => { aiLang = v; localStorage.setItem('aiLang', v); renderAIChips(); });
+}
+function openAI(album){
+  aiAlbum = album;
+  const car = getCars()[album];
+  $('aiCar').textContent = [car.year, car.make, car.model, car.trim].filter(Boolean).join(' ') + ' · ' + carLine(car);
+  renderAIChips();
+  $('aiNoKey').hidden = !!localStorage.getItem('apiKey');
+  $('aiOut').hidden = $('aiActs').hidden = true;
+  $('aiGo').disabled = false; $('aiGo').textContent = '✨ ' + t('اكتب الإعلان');
+  show($('aiSheet'));
+}
+$('aiGo').onclick = async () => {
+  const key = localStorage.getItem('apiKey');
+  if (!key){ $('aiNoKey').hidden = false; return; }
+  const car = getCars()[aiAlbum];
+  $('aiGo').disabled = true;
+  $('aiGo').innerHTML = '<i class="spin"></i>'; $('aiGo').append(t('عم يكتب…'));
+  try {
+    const {default: Anthropic} = await import(SDK_URL);
+    const client = new Anthropic({apiKey: key, dangerouslyAllowBrowser: true});
+    const res = await client.beta.messages.create({
+      model: 'claude-opus-5-5',
+      max_tokens: 16000,
+      output_config: {effort: 'low'},
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      system: AD_SYSTEM,
+      messages: [{role: 'user', content: adRequest(car, aiStyle, aiLang)}],
+    });
+    if (res.stop_reason === 'refusal') throw new Error('refusal');
+    const text = res.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+    if (!text) throw new Error('empty');
+    $('aiOut').value = text;
+    $('aiOut').hidden = $('aiActs').hidden = false;
+    $('aiGo').textContent = '✨ ' + t('اكتب من جديد');
+  } catch(e){
+    $('aiGo').textContent = '✨ ' + t('اكتب الإعلان');
+    toast(t(e.status === 401 ? 'مفتاح API غير صحيح' : e.status === 429 || e.status === 529 ? 'الخدمة مضغوطة، جرب بعد شوي'
+      : !navigator.onLine ? 'ما في اتصال بالإنترنت' : 'تعذّرت كتابة الإعلان'));
+  }
+  $('aiGo').disabled = false;
+};
+$('aiCopy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('aiOut').value); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
+};
+$('aiSave').onclick = () => {
+  const all = getNotes(); all[aiAlbum] = $('aiOut').value.trim();
+  localStorage.setItem('notes', JSON.stringify(all));
+  hide($('aiSheet')); render(); toast(t('تم الحفظ'));
+};
+// No key: hand the same request to any chat app
+$('aiCopyPrompt').onclick = async () => {
+  const req = AD_SYSTEM + '\n\n' + adRequest(getCars()[aiAlbum], aiStyle, aiLang);
+  try { await navigator.clipboard.writeText(req); toast(t('تم النسخ')); } catch(e){ toast(t('تعذّرت المشاركة')); }
+};
+$('aiAddKey').onclick = () => { hide($('aiSheet')); $('btnSettings').click(); setTimeout(() => $('apiKey').focus(), 450); };
+$('aiSheet').onclick = e => { if (e.target === $('aiSheet')) hide($('aiSheet')); };
+function renderKeyField(){
+  $('apiKey').value = '';
+  $('apiKey').placeholder = localStorage.getItem('apiKey') ? t('المفتاح محفوظ ✓') : 'sk-ant-…';
+}
+$('apiSave').onclick = () => {
+  const k = $('apiKey').value.trim();
+  if (k){ localStorage.setItem('apiKey', k); toast(t('تم حفظ المفتاح')); }
+  else if (localStorage.getItem('apiKey')){ localStorage.removeItem('apiKey'); toast(t('تم حذف المفتاح')); }
+  $('apiKey').blur(); renderKeyField();
+};
+renderKeyField();
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden){

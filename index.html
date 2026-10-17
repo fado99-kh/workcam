@@ -288,6 +288,8 @@ textarea.notes:focus{border-color:var(--accent)}
 
 
 /* new car form */
+.hint2{margin:0;font-size:12px;color:var(--muted);line-height:1.6;font-weight:400}
+.note .nok{font-size:13px;color:#7fdc9a;margin-top:6px}
 .form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .form .full{grid-column:1/-1}
 .form label,.form .full{display:flex;flex-direction:column;gap:6px}
@@ -455,7 +457,7 @@ textarea.notes:focus{border-color:var(--accent)}
     <div class="stat"><span>حماية التخزين</span><span id="stPersist"></span></div>
     <button class="wide danger" id="wipe">حذف كل شيء الآن</button>
     <button class="wide primary" id="settingsClose">تم</button>
-    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v12</p>
+    <p style="text-align:center;margin-top:12px;direction:ltr">SnapFade v13</p>
   </div>
 </div>
 
@@ -491,7 +493,13 @@ textarea.notes:focus{border-color:var(--accent)}
       <label class="full"><span>الممشى</span><div class="row2"><input id="car_mileage" inputmode="numeric" placeholder="120000"><div class="chips" id="car_unit"></div></div></label>
       <div class="full"><span class="lbl">ناقل الحركة</span><div class="chips" id="car_trans"></div></div>
       <label class="full"><span>السعر (اختياري)</span><input id="car_price" inputmode="numeric" placeholder="15000"></label>
-      <label class="full"><span>ملاحظات أو مشاكل (اختياري)</span><textarea class="notes" id="car_issues" placeholder="مثلاً: خدش على الباب، المكيف بدو صيانة…"></textarea></label>
+      <div class="full"><span class="lbl">الحالة (Status)</span><div class="chips" id="car_status"></div></div>
+      <div class="full">
+        <span class="lbl">مشاكل أو أعطال</span>
+        <p class="hint2">الأفضل تكتب أي عطل أو ملاحظة بالسيارة، حتى يطلع الإعلان صادق ويكتبها التطبيق بشكل إيجابي. إذا ما فيها شي اكبس No issues.</p>
+        <div class="chips"><button type="button" class="chip" id="car_noissues">✓ No issues</button></div>
+        <textarea class="notes" id="car_issues" placeholder="مثلاً: خدش على الباب، المكيف بدو صيانة…"></textarea>
+      </div>
     </div>
     <button class="wide primary" id="carSave"></button>
   </div>
@@ -609,6 +617,8 @@ const EN = {
   'ألبوم مع معلومات السيارة وإعلان جاهز':'An album with the car details and a ready-made listing',
   'لأي شي تاني بدك تصوره':'For anything else you want to shoot',
   'معلومات السيارة':'Car details', 'الشركة':'Make', 'الموديل':'Model', 'السنة':'Year', 'الممشى':'Mileage',
+  'الحالة (Status)':'Status', 'مشاكل أو أعطال':'Issues or faults',
+  'الأفضل تكتب أي عطل أو ملاحظة بالسيارة، حتى يطلع الإعلان صادق ويكتبها التطبيق بشكل إيجابي. إذا ما فيها شي اكبس No issues.':'Best to list any fault or note so the listing stays honest, and the app writes it up positively. If there is nothing, tap No issues.',
   'ناقل الحركة':'Transmission', 'السعر (اختياري)':'Price (optional)', 'ملاحظات أو مشاكل (اختياري)':'Notes or issues (optional)',
   'مثلاً: خدش على الباب، المكيف بدو صيانة…':'e.g. scratch on the door, A/C needs service…',
   'كم':'km', 'ميل':'mi', 'أوتوماتيك':'Automatic', 'عادي (يدوي)':'Manual',
@@ -1496,6 +1506,7 @@ function noteCard(album){
     add('ncar', [car.year, car.make, car.model].join(' '));
     add('nline', carLine(car));
     if (car.issues) add('nissue', car.issues);
+    else if (car.noIssues) add('nok', '✓ No issues');
   }
   if (car && text) add('nsep', '');
   if (text){
@@ -1750,77 +1761,138 @@ const ISSUES = [
    pro: {en: ['priced accordingly, and a great opportunity for a mechanic or someone handy'], ar: ['السعر يراعي ذلك، وهي فرصة ممتازة لميكانيكي أو لمن يفهم بالسيارات']},
    casual: {en: ['a great deal for someone who can wrench'], ar: ['لقطة لحدا بيفهم بالميكانيك']}},
 ];
-const OTHER = {pro: {en: ['disclosed upfront and reflected in the price'], ar: ['مذكور بشفافية ومحسوب بالسعر']},
-  casual: {en: ['and the price takes that into account'], ar: ['ومحسوب بالسعر']}};
+const OTHER = {
+  pro: {en: ['disclosed upfront and reflected in the price', 'already factored into the asking price', 'priced with this in mind'],
+        ar: ['مذكور بشفافية ومحسوب بالسعر', 'السعر يراعي ذلك', 'تم أخذه بعين الاعتبار في السعر']},
+  casual: {en: ["it's already in the price", 'priced with that in mind', "I've taken that off the price"],
+           ar: ['ومحسوب بالسعر', 'والسعر مراعي هالشي', 'ونازل بالسعر على هالأساس']}};
+// Notes that mean "nothing wrong" are not issues.
+const NO_ISSUE = /^(no(ne)?|no (known )?(issues?|problems?)|nothing|n\/?a|all good|everything('s| is)? (good|fine|perfect|working)|runs (great|good|perfect)|clean|ما في( شي| اشي| مشاكل| أعطال)?|لا يوجد( شيء)?|بدون (مشاكل|أعطال)|كل شي (تمام|منيح|ممتاز)|كلها? (تمام|منيحة|ممتازة)|نظيفة?|تمام)$/i;
 const isArabic = x => /[؀-ۿ]/.test(x);
 const cap = x => x.charAt(0).toUpperCase() + x.slice(1);
+const titleCase = x => x.replace(/(^|[\s-])([a-z])/g, (m, a, b) => a + b.toUpperCase());
+const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(x => x[1]);
+const aOrAn = w => /^[aeiou]/i.test(w) ? 'an' : 'a';
+
+// True, data-based selling points: {en, ar} for professional, {enC, arC} for casual.
+function highlights(c){
+  const H = [], m = (c.make + ' ' + c.model).toLowerCase();
+  const age = new Date().getFullYear() - +c.year;
+  const kmValue = c.mileage ? +c.mileage * (c.unit === 'mi' ? 1.609 : 1) : 0;
+  const price = /^\d+$/.test(c.price || '') ? +c.price : 0;
+  if (/toyota|honda|lexus|mazda|subaru|acura/.test(m))
+    H.push({en: c.make + ' reliability speaks for itself', ar: 'اعتمادية ' + c.make + ' معروفة للجميع',
+            enC: 'you know how ' + c.make + 's hold up', arC: 'وبتعرف ' + c.make + ' شو بتعمّر'});
+  if (kmValue && age > 0 && kmValue / age < 15000)
+    H.push({en: 'Low mileage for its year', ar: 'ممشى قليل بالنسبة لسنة الصنع', enC: 'the mileage is low for the year', arC: 'ممشاها قليل لسنتها'});
+  if (age >= 15)
+    H.push({en: 'Simple, proven mechanics, with parts that are cheap and easy to find', ar: 'ميكانيك بسيط ومجرّب، وقطعها متوفرة وبأسعار رخيصة',
+            enC: 'parts are cheap and easy to find', arC: 'قطعها متوفرة ورخيصة'});
+  if (price && price < 5000)
+    H.push({en: 'Budget-friendly, ideal as a first car, a commuter or a second vehicle', ar: 'سعر مناسب، ومثالية كسيارة أولى أو للمشاوير اليومية',
+            enC: "it's perfect as a first car or a cheap daily", arC: 'بتنفع سيارة أولى أو للمشاوير'});
+  else if (price && price < 20000)
+    H.push({en: 'Great value for a daily driver', ar: 'قيمة ممتازة مقابل السعر كسيارة يومية', enC: "it's great value for a daily", arC: 'قيمتها ممتازة كسيارة يومية'});
+  if (/corolla|civic|camry|accord|elantra|mazda ?3|prius|sentra|jetta|altima|forte|fit|yaris|versa|cruze/.test(m))
+    H.push({en: 'Great on gas', ar: 'اقتصادية بالبنزين', enC: "it's great on gas", arC: 'اقتصادية بالبنزين'});
+  if (/f-?150|silverado|sierra|\bram\b|tacoma|tundra|ranger|colorado|frontier|titan/.test(m))
+    H.push({en: 'A capable truck built to work', ar: 'بيك أب قوي ومصمم للشغل', enC: "it's built to work", arC: 'مصممة للشغل'});
+  if (/rav ?4|cr-?v|escape|equinox|rogue|tucson|santa fe|sorento|sportage|cx-?5|forester|outback|highlander|pilot|explorer/.test(m))
+    H.push({en: 'A practical SUV with plenty of room', ar: 'SUV عملية ومريحة ومساحتها واسعة', enC: "there's tons of room inside", arC: 'فيها مساحة كبيرة'});
+  H.push({auto: {en: 'Automatic transmission, easy to drive', ar: 'ناقل أوتوماتيك وقيادتها سهلة', enC: 'easy to drive', arC: 'سهلة السواقة'},
+    manual: {en: 'Manual transmission for drivers who enjoy being in control', ar: 'ناقل يدوي لمحبي القيادة', enC: 'fun to drive if you like stick', arC: 'ممتعة لمحبين اليدوي'},
+    cvt: {en: 'Smooth CVT transmission', ar: 'ناقل CVT ناعم', enC: 'the CVT is nice and smooth', arC: 'الـ CVT ناعم'},
+    dct: {en: 'Dual-clutch transmission with quick shifts', ar: 'ناقل دبل كلتش بتبديل سريع', enC: 'the dual-clutch shifts quick', arC: 'الدبل كلتش تبديله سريع'}}[c.trans || 'auto']);
+  H[H.length - 1].tr = true;
+  return {list: H, price};
+}
 
 function writeListing(c, style, lang){
   const ar = lang === 'ar', pro = style === 'pro', out = [];
-  const name = c.make + ' ' + c.model;
+  const make = titleCase(c.make.trim()), model = titleCase(c.model.trim()), name = make + ' ' + model;
+  const car = {...c, make, model};
+  const {list, price: priceNum} = highlights(car);
+  // casual posts already name the transmission; the intro line gets its own highlight so the list doesn't repeat it
+  const pool = shuffle(pro ? list : list.filter(h => !h.tr));
+  const lead = pool[0], hl = pro ? pool.slice(1, 4) : pool.slice(0, 2);
+  const andJoin = (a, w) => a.length > 1 ? a.slice(0, -1).join(', ') + ' ' + w + ' ' + a[a.length - 1] : a.join('');
   const km = c.mileage ? fmtNum(c.mileage) + ' ' + (ar ? (c.unit === 'mi' ? 'ميل' : 'كم') : (c.unit === 'mi' ? 'miles' : 'km')) : '';
   const price = c.price ? (/^\d+$/.test(c.price) ? '$' + fmtNum(c.price) : c.price) : '';
   const trans = transName(c, lang);
-  const issues = (c.issues || '').split(/\n|,|،|؛|;|\.(?!\d)/).map(x => x.trim()).filter(Boolean).map(txt => {
+  const rebuilt = c.status === 'rebuilt', status = rebuilt ? 'Rebuilt' : 'Active';
+  const used = new Set();
+  const fresh = arr => { const a = shuffle(arr), x = a.find(v => !used.has(v)) || a[0]; used.add(x); return x; };
+  const notes = c.noIssues ? [] : (c.issues || '').split(/\n|,|،|؛|;|\.(?!\d)/).map(x => x.trim().replace(/[.!]+$/, '')).filter(Boolean);
+  const issues = notes.filter(x => !NO_ISSUE.test(x)).map(txt => {
     const r = ISSUES.find(x => x.re.test(txt));
     // keep the seller's own words unless they are in the other language
     const text = isArabic(txt) === ar || !r ? txt : r[lang];
-    return {text: ar ? text : cap(text), spin: pick((r || OTHER)[style][lang])};
+    return {text: ar ? text : cap(text), spin: fresh((r || OTHER)[style][lang])};
   });
-  const age = new Date().getFullYear() - +c.year;
-  const kmValue = c.mileage ? +c.mileage * (c.unit === 'mi' ? 1.609 : 1) : 0;
-  const lowKm = kmValue > 0 && age > 0 && kmValue / age < 15000;
-  const reliable = /toyota|honda|lexus|mazda|subaru|acura/i.test(c.make);
+  const clean = !issues.length && (c.noIssues || notes.length > 0);
+  const caveat = issues.length || rebuilt;
 
   if (!ar && pro){
-    out.push(c.year + ' ' + name + (km ? ' – ' + km : '') + (price ? ' – ' + price : ''), '');
-    out.push(pick(['Up for sale: ' + c.year + ' ' + name + (reliable ? ', from a brand known for its reliability' : '') + '.',
-      'Now available: a ' + c.year + ' ' + name + (reliable ? ', a name known for lasting' : '') + '.'])
-      + (lowKm ? ' Low mileage for its year.' : ''), '');
+    out.push(pick([c.year + ' ' + name + (price ? ' – ' + price : ''),
+      'FOR SALE: ' + c.year + ' ' + name + (price ? ' – ' + price : ''),
+      c.year + ' ' + name + ' | ' + trans + (km ? ' | ' + km : '') + (price ? ' | ' + price : '')]), '');
+    out.push(pick([
+      'Offering a ' + c.year + ' ' + name + ' – ' + lead.en.charAt(0).toLowerCase() + lead.en.slice(1) + '.',
+      'This ' + c.year + ' ' + name + ' is ready for its next owner.',
+      'Up for sale is a ' + c.year + ' ' + name + ', a smart pick for anyone looking for ' + (priceNum && priceNum < 5000 ? 'an affordable, practical car.' : 'a practical, well-rounded vehicle.')]), '');
+    out.push(pick(['Details:', 'Key details:', 'Vehicle details:']));
     out.push('• Year: ' + c.year, '• Make & model: ' + name);
     if (km) out.push('• Mileage: ' + km);
-    out.push('• Transmission: ' + trans);
+    out.push('• Transmission: ' + trans, '• Status: ' + status);
     if (price) out.push('• Price: ' + price);
-    if (issues.length){
-      out.push('', pick(['Full disclosure, so there are no surprises:', 'Being transparent about the details:']));
+    out.push('', pick(['Highlights:', 'Why this one:', 'What you get:']));
+    for (const h of hl) out.push('• ' + h.en);
+    if (caveat){
+      out.push('', pick(['Condition notes (full disclosure):', 'Transparency notes:', 'Good to know:']));
+      if (rebuilt) out.push('• Rebuilt status – ' + fresh(OTHER.pro.en));
       for (const i of issues) out.push('• ' + i.text + ' – ' + i.spin);
-    }
-    out.push('', pick(['Serious buyers, message me to arrange a viewing or a test drive.', 'Message me for more details or to book a viewing.']));
+    } else if (clean) out.push('', pick(['No known issues.', 'No known mechanical or cosmetic issues.']));
+    out.push('', pick(['Serious inquiries only. Message me to arrange a viewing or a test drive.',
+      'Feel free to message me with any questions or to book a viewing.', 'Available to view by appointment – send me a message.']));
   } else if (!ar){
-    out.push(pick(['Got a ' + c.year + ' ' + name + ' for sale 🚗', c.year + ' ' + name + ' for sale 🚗']));
-    out.push([km && km + ' on it', /auto|manual/.test(c.trans) ? trans.toLowerCase() : trans].filter(Boolean).join(', ') + '.'
-      + (lowKm ? ' Pretty low for the year.' : '')
-      + (reliable ? pick([' You know how ' + c.make + 's hold up.', ' Super reliable brand.']) : ''));
-    if (issues.length){
-      out.push('', 'Being upfront with you:');
-      for (const i of issues) out.push('- ' + i.text + ', ' + i.spin);
-    }
-    if (price) out.push('', 'Asking ' + price + (issues.length ? pick([', priced with all of that in mind.', ", and that's already factored in."]) : '.'));
-    out.push('', pick(["Message me if you're interested 👍", 'Shoot me a message if you want to come check it out 👍']));
+    out.push(pick(['Selling a ' + c.year + ' ' + name + ' 🚗', c.year + ' ' + name + ' for sale 🚗', 'Got a ' + c.year + ' ' + name + ' up for sale 🚗']), '');
+    const t1 = /auto|manual/.test(c.trans || 'auto') ? trans.toLowerCase() : trans;
+    out.push("It's " + aOrAn(t1) + ' ' + t1 + (km ? ' with ' + km : '') + (hl.length ? ' – ' + andJoin(hl.map(h => h.enC), 'and') : '') + '.');
+    if (caveat){
+      out.push('', pick(['Just being upfront:', 'Honest heads-up:', 'So you know what you\'re getting:']));
+      if (rebuilt) out.push("- It's on a rebuilt status – " + fresh(OTHER.casual.en));
+      for (const i of issues) out.push('- ' + i.text + ' – ' + i.spin);
+    } else if (clean) out.push('', pick(['No issues that I know of.', 'Nothing wrong with it that I know of.']));
+    if (price) out.push('', 'Asking ' + price + (caveat ? pick([' – already priced with all of that in mind.', ", and that's factored in."]) : '.'));
+    out.push('', pick(["Message me if you're interested 👍", 'Shoot me a message if you want to come check it out 👍', 'Any questions, just message me 👍']));
   } else if (pro){
-    out.push('للبيع: ' + name + ' موديل ' + c.year + (price ? ' – ' + price : ''), '');
-    out.push(pick([name + ' موديل ' + c.year + (reliable ? '، من ماركة معروفة بالاعتمادية' : '') + '، جاهزة لمالكها الجديد.',
-      'نعرض للبيع ' + name + ' موديل ' + c.year + (reliable ? '، من الماركات المعروفة بمتانتها' : '') + '.'])
-      + (lowKm ? ' ممشاها قليل بالنسبة لسنة الصنع.' : ''), '');
+    out.push(pick(['للبيع: ' + name + ' موديل ' + c.year + (price ? ' – ' + price : ''), name + ' ' + c.year + ' للبيع' + (price ? ' – ' + price : '')]), '');
+    out.push(pick(['نعرض للبيع ' + name + ' موديل ' + c.year + '، ' + lead.ar + '.',
+      name + ' موديل ' + c.year + ' جاهزة لمالكها الجديد.',
+      'فرصة لاقتناء ' + name + ' موديل ' + c.year + (priceNum && priceNum < 5000 ? ' بسعر اقتصادي.' : ' بسعر مناسب.')]), '');
+    out.push(pick(['التفاصيل:', 'مواصفات السيارة:']));
     out.push('• سنة الصنع: ' + c.year, '• الماركة والموديل: ' + name);
     if (km) out.push('• الممشى: ' + km);
-    out.push('• ناقل الحركة: ' + trans);
+    out.push('• ناقل الحركة: ' + trans, '• الحالة: ' + status);
     if (price) out.push('• السعر: ' + price);
-    if (issues.length){
-      out.push('', pick(['للأمانة وحتى تكون الصورة واضحة:', 'بكل شفافية:']));
+    out.push('', pick(['المميزات:', 'لماذا هذه السيارة:']));
+    for (const h of hl) out.push('• ' + h.ar);
+    if (caveat){
+      out.push('', pick(['ملاحظات بكل شفافية:', 'للأمانة وحتى تكون الصورة واضحة:']));
+      if (rebuilt) out.push('• حالة Rebuilt، ' + fresh(OTHER.pro.ar));
       for (const i of issues) out.push('• ' + i.text + '، ' + i.spin);
-    }
-    out.push('', pick(['للاستفسار أو لحجز موعد معاينة، تواصل معي برسالة.', 'للجادين فقط، راسلني لترتيب معاينة أو تجربة قيادة.']));
+    } else if (clean) out.push('', pick(['لا توجد أعطال معروفة.', 'لا توجد أي أعطال ميكانيكية أو شكلية معروفة.']));
+    out.push('', pick(['للاستفسار أو لحجز موعد معاينة، تواصل معي برسالة.', 'للجادين فقط، راسلني لترتيب معاينة أو تجربة قيادة.', 'المعاينة بموعد مسبق، وأهلاً بأي استفسار.']));
   } else {
-    out.push(pick(['سيارة للبيع 🚗 ' + name + ' موديل ' + c.year, name + ' ' + c.year + ' للبيع 🚗']));
-    out.push([km && 'ماشية ' + km, trans].filter(Boolean).join('، ') + '.'
-      + (lowKm ? ' ممشاها قليل لسنتها.' : '') + (reliable ? ' وبتعرف ' + c.make + ' شو بتعمّر.' : ''));
-    if (issues.length){
-      out.push('', 'وبكل صراحة:');
+    out.push(pick([name + ' ' + c.year + ' للبيع 🚗', 'سيارة للبيع 🚗 ' + name + ' موديل ' + c.year, 'عندي ' + name + ' ' + c.year + ' للبيع 🚗']), '');
+    out.push(trans + (km ? '، ماشية ' + km : '') + (hl.length ? '. ' + hl.map(h => h.arC).join('، و') : '') + '.');
+    if (caveat){
+      out.push('', pick(['وبكل صراحة:', 'وللأمانة:', 'حتى تكون عارف شو عم تشتري:']));
+      if (rebuilt) out.push('- السيارة Rebuilt، ' + fresh(OTHER.casual.ar));
       for (const i of issues) out.push('- ' + i.text + '، ' + i.spin);
-    }
-    if (price) out.push('', 'السعر ' + price + (issues.length ? '، ومحسوب فيه كل شي.' : '.'));
-    out.push('', pick(['اللي مهتم يبعتلي رسالة 👍', 'أي سؤال راسلني 👍']));
+    } else if (clean) out.push('', pick(['ما فيها ولا مشكلة على حد علمي.', 'ما فيها شي على حد علمي.']));
+    if (price) out.push('', 'السعر ' + price + (caveat ? '، ومحسوب فيه كل شي.' : '.'));
+    out.push('', pick(['اللي مهتم يبعتلي رسالة 👍', 'أي سؤال راسلني 👍', 'للمعاينة راسلني 👍']));
   }
   return out.join('\n');
 }
@@ -1837,11 +1909,16 @@ function openAI(album){
   $('aiCar').textContent = [car.year, car.make, car.model].join(' ') + ' · ' + carLine(car);
   renderAIChips();
   $('aiOut').hidden = $('aiActs').hidden = true;
+  $('aiOut').value = '';
   $('aiGo').textContent = '✨ ' + t('اكتب الإعلان');
   show($('aiSheet'));
 }
 $('aiGo').onclick = () => {
-  $('aiOut').value = writeListing(getCars()[aiAlbum], aiStyle, aiLang);
+  // each tap gives a different version
+  const car = getCars()[aiAlbum], prev = $('aiOut').value;
+  let text = writeListing(car, aiStyle, aiLang);
+  for (let i = 0; i < 12 && text === prev; i++) text = writeListing(car, aiStyle, aiLang);
+  $('aiOut').value = text;
   $('aiOut').hidden = $('aiActs').hidden = false;
   $('aiGo').textContent = '✨ ' + t('اكتب من جديد');
 };
@@ -1862,7 +1939,7 @@ const setCars = c => localStorage.setItem('cars', JSON.stringify(c));
 const fmtNum = v => /^\d+$/.test(v) ? Number(v).toLocaleString('en-US') : v;
 function carLine(c){
   return [c.mileage && fmtNum(c.mileage) + ' ' + t(c.unit === 'mi' ? 'ميل' : 'كم'),
-    transName(c, LANG),
+    transName(c, LANG), c.status === 'rebuilt' ? 'Rebuilt' : 'Active',
     c.price && (/^\d+$/.test(c.price) ? '$' + fmtNum(c.price) : c.price)].filter(Boolean).join(' · ');
 }
 function chipRow(el, opts, cur, pick){
@@ -1873,17 +1950,20 @@ function chipRow(el, opts, cur, pick){
     return b;
   }));
 }
-let carEdit = null, carForm = {unit: 'km', trans: 'auto'};
+let carEdit = null, carForm = {unit: 'km', trans: 'auto', status: 'active', noIssues: false};
 function renderCarChips(){
   chipRow($('car_unit'), [['km','كم'],['mi','ميل']], carForm.unit, v => { carForm.unit = v; renderCarChips(); });
   chipRow($('car_trans'), Object.entries(TRANS).map(([k, [a, e]]) => [k, LANG === 'ar' ? a : e]), carForm.trans, v => { carForm.trans = v; renderCarChips(); });
+  chipRow($('car_status'), [['active','Active'],['rebuilt','Rebuilt']], carForm.status, v => { carForm.status = v; renderCarChips(); });
+  $('car_noissues').classList.toggle('on', carForm.noIssues);
+  $('car_issues').hidden = carForm.noIssues;
 }
 const CAR_FIELDS = ['make','model','year','mileage','price','issues'];
 function openCarForm(album){
   carEdit = album || null;
   const c = album ? getCars()[album] || {} : {};
   for (const k of CAR_FIELDS) $('car_' + k).value = c[k] || '';
-  carForm = {unit: c.unit || 'km', trans: c.trans || 'auto'};
+  carForm = {unit: c.unit || 'km', trans: c.trans || 'auto', status: c.status || 'active', noIssues: !!c.noIssues};
   renderCarChips();
   $('carTitle').textContent = t(album ? 'معلومات السيارة' : 'سيارة جديدة');
   $('carSave').textContent = t(album ? 'حفظ المعلومات' : 'حفظ وابدأ التصوير');
@@ -1891,9 +1971,9 @@ function openCarForm(album){
 }
 $('carSave').onclick = () => {
   const v = k => $('car_' + k).value.trim();
-  const car = {make: v('make'), model: v('model'), year: v('year'),
-    mileage: v('mileage').replace(/[^\d]/g, ''), price: v('price'), issues: v('issues'),
-    unit: carForm.unit, trans: carForm.trans};
+  const car = {make: titleCase(v('make')), model: titleCase(v('model')), year: v('year'),
+    mileage: v('mileage').replace(/[^\d]/g, ''), price: v('price'), issues: carForm.noIssues ? '' : v('issues'),
+    unit: carForm.unit, trans: carForm.trans, status: carForm.status, noIssues: carForm.noIssues};
   const miss = ['make','model','year'].find(k => !car[k]);
   if (miss){ $('car_' + miss).focus(); return toast(t('عبّي الشركة والموديل والسنة')); }
   document.activeElement?.blur?.();
@@ -1910,6 +1990,7 @@ $('carSave').onclick = () => {
   // photos taken now go straight into this car's album
   if (!carEdit) $('btnCam').onclick();
 };
+$('car_noissues').onclick = () => { carForm.noIssues = !carForm.noIssues; renderCarChips(); };
 $('carSheet').onclick = e => { if (e.target === $('carSheet')) hide($('carSheet')); };
 $('newSheet').onclick = e => { if (e.target === $('newSheet')) hide($('newSheet')); };
 $('newCar').onclick = () => { hide($('newSheet')); openCarForm(); };
